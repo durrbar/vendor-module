@@ -2,10 +2,9 @@
 
 namespace Modules\Vendor\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-
 
 class BecameSellersRequest extends FormRequest
 {
@@ -28,11 +27,11 @@ class BecameSellersRequest extends FormRequest
     {
         return [
             'page_options' => ['required', 'array'],
-            'commission.*.min_balance' => ['required','numeric', 'min:0'],
+            'commission.*.min_balance' => ['required', 'numeric', 'min:0'],
             'commission.*.max_balance' => ['required'],
-            'commission.*.commission' => ['required','numeric', 'min:0'],
-            'commission.*.level' => ['required','string'],
-            'commission.*.sub_level' => ['required','string'],
+            'commission.*.commission' => ['required', 'numeric', 'min:0'],
+            'commission.*.level' => ['required', 'string'],
+            'commission.*.sub_level' => ['required', 'string'],
         ];
     }
 

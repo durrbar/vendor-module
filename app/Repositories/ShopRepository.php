@@ -1,18 +1,17 @@
 <?php
 
-
 namespace Modules\Vendor\Repositories;
 
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Modules\Core\Repositories\BaseRepository;
-use Modules\Ecommerce\Models\Product;
 use Modules\Ecommerce\Enums\DefaultStatusType;
-use Modules\Role\Enums\Permission;
 use Modules\Ecommerce\Enums\ProductVisibilityStatus;
-use Modules\Ecommerce\Events\ProcessOwnershipTransition;
-use Modules\Ecommerce\Events\ShopMaintenance;
+use Modules\Ecommerce\Models\Product;
+use Modules\Role\Enums\Permission;
 use Modules\User\Models\User;
+use Modules\Vendor\Events\ProcessOwnershipTransition;
+use Modules\Vendor\Events\ShopMaintenance;
 use Modules\Vendor\Http\Requests\TransferShopOwnerShipRequest;
 use Modules\Vendor\Models\Balance;
 use Modules\Vendor\Models\OwnershipTransfer;
@@ -23,15 +22,14 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ShopRepository extends BaseRepository
 {
-
     /**
      * @var array
      */
     protected $fieldSearchable = [
-        'name'        => 'like',
+        'name' => 'like',
         'is_active',
         'categories.slug',
-        'users.name'
+        'users.name',
     ];
 
     /**
@@ -48,7 +46,6 @@ class ShopRepository extends BaseRepository
         'settings',
         'notifications',
     ];
-
 
     public function boot()
     {
@@ -107,7 +104,7 @@ class ShopRepository extends BaseRepository
                 }
             }
             $data = $request->only($this->dataArray);
-            if (!empty($request->slug) &&  $request->slug != $shop['slug']) {
+            if (! empty($request->slug) && $request->slug != $shop['slug']) {
                 $data['slug'] = $this->makeSlug($request);
             }
             $shop->update($data);
@@ -117,9 +114,8 @@ class ShopRepository extends BaseRepository
             // $shop->staffs = $shop->staffs;
             // $shop->balance = $shop->balance;
 
-
             // 1. Shop owner maintenance time set korbe.. then ekta event fire hobe jeita shop notifications (email, sms) send korbe super-admin, vendor, staff, oi specific shop er front-end a ekta notice dekhabe with countdown.
-            // 2. countDown start er 1 day ago or 6 hours ago ekta final email/sms dibe vendor, staff k 
+            // 2. countDown start er 1 day ago or 6 hours ago ekta final email/sms dibe vendor, staff k
             // 3. countdown onStart a sob product private
             // 4. countdown onComplete a sob product public
 
@@ -164,7 +160,7 @@ class ShopRepository extends BaseRepository
         $user = $request->user();
         $shopId = $request->shop_id ?? null;
 
-        if (!$this->hasPermission($user, $shopId)) {
+        if (! $this->hasPermission($user, $shopId)) {
             throw new AuthorizationException(NOT_AUTHORIZED);
         }
 
@@ -176,19 +172,19 @@ class ShopRepository extends BaseRepository
 
         OwnershipTransfer::updateOrCreate(
             [
-                "shop_id"    => $shopId,
+                'shop_id' => $shopId,
             ],
             [
-                "from"       => $previousOwner->id,
-                "message"    => $request?->message,
-                "to"         => $newOwnerId,
-                "created_by" => $user->id,
-                "status"     => DefaultStatusType::PENDING,
+                'from' => $previousOwner->id,
+                'message' => $request?->message,
+                'to' => $newOwnerId,
+                'created_by' => $user->id,
+                'status' => DefaultStatusType::PENDING,
             ]
         );
 
         $optional = [
-            'message' =>  $request?->vendorMessage,
+            'message' => $request?->vendorMessage,
         ];
 
         event(new ProcessOwnershipTransition($shop, $previousOwner, $newOwner, $optional));

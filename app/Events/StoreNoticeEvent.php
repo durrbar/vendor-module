@@ -1,24 +1,23 @@
 <?php
 
-
 namespace Modules\Vendor\Events;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Modules\Ecommerce\Exceptions\MarvelException;
+use Modules\Core\Exceptions\DurrbarException;
 use Modules\Settings\Models\Settings;
 use Modules\User\Models\User;
 use Modules\Vendor\Models\StoreNotice;
 
-class StoreNoticeEvent implements ShouldQueue, ShouldBroadcast
+class StoreNoticeEvent implements ShouldBroadcast, ShouldQueue
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     /**
      * user
@@ -44,10 +43,8 @@ class StoreNoticeEvent implements ShouldQueue, ShouldBroadcast
     /**
      * Create a new event instance.
      *
-     * @param StoreNotice|array $storeNotice
-     * @param null|string $action
-     * @param User|array $user
-     * 
+     * @param  StoreNotice|array  $storeNotice
+     * @param  User|array  $user
      * @return void
      */
     public function __construct(StoreNotice $storeNotice, ?string $action, User $user)
@@ -66,14 +63,14 @@ class StoreNoticeEvent implements ShouldQueue, ShouldBroadcast
     {
         $event_channels = [];
         if (isset($this->storeNotice->users)) {
-            foreach ($this->storeNotice->users as $key => $user) {
-                $channel_name = new PrivateChannel('store_notice.created.' . $user->id);
+            foreach ($this->storeNotice->users as $user) {
+                $channel_name = new PrivateChannel('store_notice.created.'.$user->id);
                 array_push($event_channels, $channel_name);
             }
         }
+
         return $event_channels;
     }
-
 
     /**
      * Get the data to broadcast.
@@ -115,9 +112,10 @@ class StoreNoticeEvent implements ShouldQueue, ShouldBroadcast
                     $enableBroadCast = true;
                 }
             }
+
             return $enableBroadCast;
-        } catch (MarvelException $th) {
-            throw new MarvelException(SOMETHING_WENT_WRONG, $th->getMessage());
+        } catch (DurrbarException $th) {
+            throw new DurrbarException(SOMETHING_WENT_WRONG, $th->getMessage());
         }
     }
 }

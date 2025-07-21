@@ -1,20 +1,16 @@
 <?php
 
-
 namespace Modules\Vendor\Http\Resources;
-
 
 use Illuminate\Http\Request;
 use Modules\Core\Http\Resources\Resource;
-use Modules\Ecommerce\Helper\ResourceHelpers;
-
 
 class GetSingleStoreNoticeResource extends Resource
 {
     /**
      * Transform the resource into an array.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return array
      */
     public function toArray($request)
@@ -30,7 +26,6 @@ class GetSingleStoreNoticeResource extends Resource
             'creator_role' => $this->creator_role,
             'users' => $this->users,
             'shops' => $this->shops,
-
 
         ];
     }

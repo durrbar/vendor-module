@@ -6,23 +6,18 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Modules\Ecommerce\Models\Product;
-use Modules\Ecommerce\Repositories\FlashSaleRepository;
-use Modules\Role\Enums\Permission;
-use Modules\Ecommerce\Events\FlashSaleProcessed;
-use Modules\Ecommerce\Exceptions\MarvelException;
-use Modules\Ecommerce\Http\Requests\CreateFlashSaleRequest;
-use Modules\Ecommerce\Http\Requests\UpdateFlashSaleRequest;
-use Prettus\Validator\Exceptions\ValidatorException;
-use Illuminate\Support\Facades\DB;
+use Modules\Core\Exceptions\DurrbarException;
 use Modules\Core\Http\Controllers\CoreController;
+use Modules\Ecommerce\Events\FlashSaleProcessed;
+use Modules\Ecommerce\Http\Requests\UpdateFlashSaleRequest;
 use Modules\Ecommerce\Models\FlashSaleRequests;
-use Modules\Ecommerce\Http\Resources\FlashSaleResource;
 use Modules\Ecommerce\Repositories\ProductRepository;
+use Modules\Role\Enums\Permission;
 use Modules\Vendor\Http\Requests\CreateVendorFlashSaleRequest;
 use Modules\Vendor\Http\Requests\UpdateVendorFlashSaleRequest;
 use Modules\Vendor\Models\FlashSale;
 use Modules\Vendor\Repositories\FlashSaleVendorRequestRepository;
+use Prettus\Validator\Exceptions\ValidatorException;
 
 class FlashSaleVendorRequestController extends CoreController
 {
@@ -36,32 +31,31 @@ class FlashSaleVendorRequestController extends CoreController
         $this->productRepository = $productRepository;
     }
 
-
     /**
      * Display a listing of the resource.
      *
-     * @param Request $request
      * @return Collection|FlashSaleRequests[]
      */
     public function index(Request $request)
     {
         try {
             $limit = $request->limit ? $request->limit : 10;
+
             return $this->fetchFlashSalesRequests($request)->paginate($limit)->withQueryString();
-        } catch (MarvelException $e) {
-            throw new MarvelException(SOMETHING_WENT_WRONG, $e->getMessage());
+        } catch (DurrbarException $e) {
+            throw new DurrbarException(SOMETHING_WENT_WRONG, $e->getMessage());
         }
     }
 
     /**
      * fetchFlashSalesRequests
      *
-     * @param  Request $request
      * @return object
      */
     public function fetchFlashSalesRequests(Request $request)
     {
         $language = $request->language ?? DEFAULT_LANGUAGE;
+
         // event(new FlashSaleProcessed('index', $language));
         return $this->repository->where('language', $language);
     }
@@ -69,75 +63,75 @@ class FlashSaleVendorRequestController extends CoreController
     /**
      * Store a newly created faq in storage.
      *
-     * @param CreateVendorFlashSaleRequest $request
      * @return mixed
+     *
      * @throws ValidatorException
      */
     public function store(CreateVendorFlashSaleRequest $request)
     {
         try {
             return $this->repository->storeFlashSaleRequest($request);
-        } catch (MarvelException $e) {
-            throw new MarvelException(COULD_NOT_CREATE_THE_RESOURCE, $e->getMessage());
+        } catch (DurrbarException $e) {
+            throw new DurrbarException(COULD_NOT_CREATE_THE_RESOURCE, $e->getMessage());
         }
     }
 
     /**
      * Display the specified flash sale.
      *
-     * @param string $id
+     * @param  string  $id
      * @return JsonResponse
      */
     public function show(Request $request, $id)
     {
         try {
             $language = $request->language ?? DEFAULT_LANGUAGE;
+
             return $this->repository->where('language', $language)->where('id', '=', $id)->first();
-        } catch (MarvelException $e) {
-            throw new MarvelException(NOT_FOUND, $e->getMessage());
+        } catch (DurrbarException $e) {
+            throw new DurrbarException(NOT_FOUND, $e->getMessage());
         }
     }
-
 
     /**
      * Update the specified flash sale
      *
-     * @param UpdateVendorFlashSaleRequest $request
-     * @param int $id
+     * @param  int  $id
      * @return JsonResponse
      */
     public function update(UpdateVendorFlashSaleRequest $request, $id)
     {
         try {
             $request->merge(['id' => $id]);
+
             return $this->updateFlashSaleRequest($request);
-        } catch (MarvelException $e) {
-            throw new MarvelException(COULD_NOT_UPDATE_THE_RESOURCE, $e->getMessage());
+        } catch (DurrbarException $e) {
+            throw new DurrbarException(COULD_NOT_UPDATE_THE_RESOURCE, $e->getMessage());
         }
     }
 
     /**
      * updateFlashSaleRequest
      *
-     * @param  Request $request
      * @return void
      */
     public function updateFlashSaleRequest(Request $request)
     {
         $id = $request->id;
+
         return $this->repository->updateFlashSaleRequest($request, $id);
     }
 
     /**
      * Remove the specified flash sale
      *
-     * @param int $id
-     * @param Request $request
+     * @param  int  $id
      * @return JsonResponse
      */
     public function destroy($id, Request $request)
     {
         $request->merge(['id' => $id]);
+
         return $this->deleteFlashSaleRequest($request);
     }
 
@@ -154,7 +148,7 @@ class FlashSaleVendorRequestController extends CoreController
 
                 if (isset($requested_products)) {
                     // $flash_sale = FlashSale::with('products')->findOrFail($flash_sale_request->flash_sale_id);
-                    $flash_sale = FlashSale::with('products')->where("id", "=", $flash_sale_request->flash_sale_id)->first();
+                    $flash_sale = FlashSale::with('products')->where('id', '=', $flash_sale_request->flash_sale_id)->first();
 
                     foreach ($requested_products as $product) {
                         // detach requested products from flash_sale_products pivot table.
@@ -168,78 +162,75 @@ class FlashSaleVendorRequestController extends CoreController
 
                 $prepare_event_data = [
                     'requested_flash_sale' => $flash_sale,
-                    'detached_products' => $detached_products_array
+                    'detached_products' => $detached_products_array,
                 ];
                 event(new FlashSaleProcessed('delete_vendor_request', DEFAULT_LANGUAGE, $prepare_event_data));
 
                 $flash_sale_request->forceDelete();
+
                 return $flash_sale_request;
             }
             throw new AuthorizationException(NOT_AUTHORIZED);
-        } catch (MarvelException $e) {
-            throw new MarvelException(NOT_FOUND, $e->getMessage());
+        } catch (DurrbarException $e) {
+            throw new DurrbarException(NOT_FOUND, $e->getMessage());
         }
     }
 
     /**
      * approveFlashSaleProductsRequest
      *
-     * @param  Request $request
      * @return void
      */
     public function approveFlashSaleProductsRequest(Request $request)
     {
         try {
-            if (!$request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
-                throw new MarvelException(NOT_AUTHORIZED);
+            if (! $request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
+                throw new DurrbarException(NOT_AUTHORIZED);
             }
             $id = $request->id;
             $this->repository->approveFlashSaleVendorRequestFunc($id);
-        } catch (MarvelException $e) {
-            throw new MarvelException(SOMETHING_WENT_WRONG, $e->getMessage());
+        } catch (DurrbarException $e) {
+            throw new DurrbarException(SOMETHING_WENT_WRONG, $e->getMessage());
         }
     }
 
     /**
      * disapproveFlashSaleProductsRequest
      *
-     * @param  Request $request
      * @return void
      */
     public function disapproveFlashSaleProductsRequest(Request $request)
     {
         try {
-            if (!$request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
-                throw new MarvelException(NOT_AUTHORIZED);
+            if (! $request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
+                throw new DurrbarException(NOT_AUTHORIZED);
             }
             $id = $request->id;
             $this->repository->disapproveFlashSaleVendorRequestFunc($id);
-        } catch (MarvelException $e) {
-            throw new MarvelException(SOMETHING_WENT_WRONG, $e->getMessage());
+        } catch (DurrbarException $e) {
+            throw new DurrbarException(SOMETHING_WENT_WRONG, $e->getMessage());
         }
     }
-
 
     /**
      * getRequestedProductsForFlashSale
      *
-     * @param  Request $request
      * @return object
      */
     public function getRequestedProductsForFlashSale(Request $request)
     {
         try {
             $limit = $request->limit ? $request->limit : 10;
+
             return $this->fetchRequestedProducts($request)->paginate($limit)->withQueryString();
-        } catch (MarvelException $e) {
-            throw new MarvelException(SOMETHING_WENT_WRONG, $e->getMessage());
+        } catch (DurrbarException $e) {
+            throw new DurrbarException(SOMETHING_WENT_WRONG, $e->getMessage());
         }
     }
 
     /**
      * fetchRequestedProducts
      *
-     * @param  Request $request
      * @return object
      */
     public function fetchRequestedProducts(Request $request)

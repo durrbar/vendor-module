@@ -1,23 +1,20 @@
 <?php
 
-
 namespace Modules\Vendor\Repositories;
 
 use Carbon\Carbon;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Modules\Core\Exceptions\DurrbarBadRequestException;
 use Modules\Core\Repositories\BaseRepository;
-use Modules\Order\Models\Order;
 use Modules\Order\Enums\OrderStatus;
-use Modules\Ecommerce\Exceptions\MarvelBadRequestException;
+use Modules\Order\Models\Order;
 use Modules\Vendor\Models\OwnershipTransfer;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
 
 class OwnershipTransferRepository extends BaseRepository
 {
-
     /**
      * @var array
      */
@@ -26,7 +23,7 @@ class OwnershipTransferRepository extends BaseRepository
         'shop_id',
         'status',
         'from',
-        'to'
+        'to',
     ];
 
     public function boot()
@@ -62,7 +59,7 @@ class OwnershipTransferRepository extends BaseRepository
                     OrderStatus::PENDING,
                     OrderStatus::PROCESSING,
                     OrderStatus::AT_LOCAL_FACILITY,
-                    OrderStatus::OUT_FOR_DELIVERY
+                    OrderStatus::OUT_FOR_DELIVERY,
                 ]
             )->count();
 
@@ -73,22 +70,23 @@ class OwnershipTransferRepository extends BaseRepository
         // Required : no running order, all order must be completed.
         // Required : balance should be or less than $1.00, then the shop can be transferred.
         // Required : no running withdrawal request.
-        // 
+        //
         // if those 3 above condition is true, then a shop status can be changed.
         if ($totalIncompleteOrders || (round($currentBalance, 2) > 1.00) || $nonApprovedWithdrawCount) {
-            throw new MarvelBadRequestException(COULD_NOT_SETTLE_THE_TRANSITION);
+            throw new DurrbarBadRequestException(COULD_NOT_SETTLE_THE_TRANSITION);
         }
         $transferHistory->update(['status' => $request['status']]);
+
         return $transferHistory->refresh();
     }
 
     public function getOwnershipTransferHistory($request)
     {
-        $ownershipTransfer =  $this->where('transaction_identifier', '=', $request->transaction_identifier)->with(['shop'])->firstOrFail();
+        $ownershipTransfer = $this->where('transaction_identifier', '=', $request->transaction_identifier)->with(['shop'])->firstOrFail();
         if ($request->request_view_type === 'detail') {
             $orderInfoRelatedToShop = $this->orderInfoRelatedToShop($ownershipTransfer->shop->id) ?? [];
             $balanceInfoRelatedToShop = $this->balanceInfoRelatedToShop($ownershipTransfer->shop->id) ?? [];
-            $refundInfoRelatedToShop =  $this->refundInfoRelatedToShop($ownershipTransfer->shop->id) ?? [];
+            $refundInfoRelatedToShop = $this->refundInfoRelatedToShop($ownershipTransfer->shop->id) ?? [];
             $withdrawInfoRelatedToShop = $this->withdrawInfoRelatedToShop($ownershipTransfer->shop->id) ?? [];
 
             $ownershipTransfer->setRelation('order_info', $orderInfoRelatedToShop);
@@ -96,6 +94,7 @@ class OwnershipTransferRepository extends BaseRepository
             $ownershipTransfer->setRelation('refund_info', $refundInfoRelatedToShop);
             $ownershipTransfer->setRelation('withdrawal_info', $withdrawInfoRelatedToShop);
         }
+
         return $ownershipTransfer;
     }
 
@@ -113,32 +112,35 @@ class OwnershipTransferRepository extends BaseRepository
             ->pluck('order_count', 'order_status');
 
         return [
-            'pending'        => $query[OrderStatus::PENDING]           ?? 0,
-            'processing'     => $query[OrderStatus::PROCESSING]        ?? 0,
-            'complete'       => $query[OrderStatus::COMPLETED]         ?? 0,
-            'cancelled'      => $query[OrderStatus::CANCELLED]         ?? 0,
-            'refunded'       => $query[OrderStatus::REFUNDED]          ?? 0,
-            'failed'         => $query[OrderStatus::FAILED]            ?? 0,
-            'localFacility'  => $query[OrderStatus::AT_LOCAL_FACILITY] ?? 0,
-            'outForDelivery' => $query[OrderStatus::OUT_FOR_DELIVERY]  ?? 0,
+            'pending' => $query[OrderStatus::PENDING] ?? 0,
+            'processing' => $query[OrderStatus::PROCESSING] ?? 0,
+            'complete' => $query[OrderStatus::COMPLETED] ?? 0,
+            'cancelled' => $query[OrderStatus::CANCELLED] ?? 0,
+            'refunded' => $query[OrderStatus::REFUNDED] ?? 0,
+            'failed' => $query[OrderStatus::FAILED] ?? 0,
+            'localFacility' => $query[OrderStatus::AT_LOCAL_FACILITY] ?? 0,
+            'outForDelivery' => $query[OrderStatus::OUT_FOR_DELIVERY] ?? 0,
         ];
     }
 
     public function balanceInfoRelatedToShop($shop_id)
     {
-        $shopBalanceInfo =  DB::table('balances')->where('shop_id', '=', $shop_id)->first();
+        $shopBalanceInfo = DB::table('balances')->where('shop_id', '=', $shop_id)->first();
+
         return $shopBalanceInfo;
     }
 
     public function refundInfoRelatedToShop($shop_id)
     {
-        $shopRefundInfo =  DB::table('refunds')->where('shop_id', '=', $shop_id)->get();
+        $shopRefundInfo = DB::table('refunds')->where('shop_id', '=', $shop_id)->get();
+
         return $shopRefundInfo;
     }
 
     public function withdrawInfoRelatedToShop($shop_id)
     {
-        $shopRefundInfo =  DB::table('withdraws')->where('shop_id', '=', $shop_id)->get();
+        $shopRefundInfo = DB::table('withdraws')->where('shop_id', '=', $shop_id)->get();
+
         return $shopRefundInfo;
     }
 }

@@ -2,16 +2,13 @@
 
 namespace Modules\Vendor\Http\Controllers;
 
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Modules\Core\Exceptions\DurrbarException;
+use Modules\Core\Exceptions\DurrbarNotFoundException;
 use Modules\Core\Http\Controllers\CoreController;
-use Modules\Order\Enums\OrderStatus;
-use Modules\Ecommerce\Exceptions\MarvelException;
-use Modules\Ecommerce\Exceptions\MarvelNotFoundException;
 use Modules\Ecommerce\Http\Resources\OwnershipTransferResource;
 use Modules\Role\Enums\Permission;
 use Modules\Vendor\Events\OwnershipTransferStatusControl;
@@ -26,19 +23,18 @@ class OwnershipTransferController extends CoreController
         $this->repository = $repository;
     }
 
-
     /**
      * Display a listing of the resource.
      *
-     * @param Request $request
      *
      * @return \Illuminate\Http\JsonResponse
      */
     public function index(Request $request)
     {
-        $limit = $request->limit ?   $request->limit : 15;
+        $limit = $request->limit ? $request->limit : 15;
         $ownershipHistory = $this->fetchOwnershipTransferHistories($request)->paginate($limit)->withQueryString();
         $data = OwnershipTransferResource::collection($ownershipHistory)->response()->getData(true);
+
         return formatAPIResourcePaginate($data);
     }
 
@@ -67,22 +63,23 @@ class OwnershipTransferController extends CoreController
     /**
      * Display the specified resource.
      *
-     * @param $transaction_identifier
      * @return OwnershipTransferResource
      */
     public function show(Request $request, $transaction_identifier)
     {
         try {
-            $request->merge(["transaction_identifier" => $transaction_identifier]);
+            $request->merge(['transaction_identifier' => $transaction_identifier]);
+
             return $this->fetchOwnerTransferHistory($request);
-        } catch (MarvelException $th) {
-            throw new MarvelException(NOT_FOUND);
+        } catch (DurrbarException $th) {
+            throw new DurrbarException(NOT_FOUND);
         }
     }
+
     /**
      * Display the specified resource.
      *
-     * @param $slug
+     * @param  $slug
      * @return OwnershipTransferResource
      */
     public function fetchOwnerTransferHistory(Request $request)
@@ -92,27 +89,29 @@ class OwnershipTransferController extends CoreController
             // $ownershipTransfer->setRelation('order_info', $this->orderInfoRelatedToShop($ownershipTransfer->shop->id));
 
             $ownershipTransfer = $this->repository->getOwnershipTransferHistory($request);
+
             return new OwnershipTransferResource($ownershipTransfer);
         } catch (Exception $e) {
-            throw new MarvelNotFoundException(NOT_FOUND);
+            throw new DurrbarNotFoundException(NOT_FOUND);
         }
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param int $id
+     * @param  int  $id
      * @return OwnershipTransferResource
-     * @throws \Modules\Ecommerce\Exceptions\MarvelException
+     *
+     * @throws \Modules\Core\Exceptions\DurrbarException
      */
     public function update(Request $request, $id)
     {
         try {
             $request->merge(['id' => $id]);
+
             return $this->updateOwnershipTransfer($request);
-        } catch (MarvelException $th) {
-            throw new MarvelException(COULD_NOT_UPDATE_THE_RESOURCE);
+        } catch (DurrbarException $th) {
+            throw new DurrbarException(COULD_NOT_UPDATE_THE_RESOURCE);
         }
     }
 
@@ -120,43 +119,44 @@ class OwnershipTransferController extends CoreController
     {
         try {
             $user = $request->user();
-            if (!$user->hasPermissionTo(Permission::SUPER_ADMIN)) {
+            if (! $user->hasPermissionTo(Permission::SUPER_ADMIN)) {
                 throw new AuthorizationException(NOT_AUTHORIZED);
             }
-            $data =  $this->repository->updateOwnershipTransfer($request);
-            
+            $data = $this->repository->updateOwnershipTransfer($request);
+
             event(new OwnershipTransferStatusControl($data));
 
             return new OwnershipTransferResource($data);
-        } catch (MarvelException $th) {
-            throw new MarvelException(COULD_NOT_UPDATE_THE_RESOURCE);
+        } catch (DurrbarException $th) {
+            throw new DurrbarException(COULD_NOT_UPDATE_THE_RESOURCE);
         }
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param $id
      * @return JsonResponse
      */
     public function destroy($id, Request $request)
     {
         try {
             $request->merge(['id' => $id]);
+
             return $this->deleteOwnershipTransfer($request);
-        } catch (MarvelException $th) {
-            throw new MarvelException(COULD_NOT_DELETE_THE_RESOURCE);
+        } catch (DurrbarException $th) {
+            throw new DurrbarException(COULD_NOT_DELETE_THE_RESOURCE);
         }
     }
 
     public function deleteOwnershipTransfer(Request $request)
     {
         $user = $request->user();
-        if (!$this->repository->hasPermission($user, $request?->shop_id)) {
+        if (! $this->repository->hasPermission($user, $request?->shop_id)) {
             throw new AuthorizationException(NOT_AUTHORIZED);
         }
-        $ownershipTransfer =  $this->repository->findOrFail($request->id);
+        $ownershipTransfer = $this->repository->findOrFail($request->id);
         $ownershipTransfer->delete();
+
         return $ownershipTransfer;
     }
 }

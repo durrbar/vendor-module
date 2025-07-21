@@ -9,14 +9,15 @@ use Modules\User\Models\User;
 class StoreNoticeRead extends Pivot
 {
     public $guarded = [];
+
     public $with = ['user'];
+
     public $timestamps = false;
+
     protected $table = 'store_notice_read';
 
     /**
      * user
-     *
-     * @return BelongsTo
      */
     public function user(): BelongsTo
     {
@@ -25,8 +26,6 @@ class StoreNoticeRead extends Pivot
 
     /**
      * StoreNotice
-     *
-     * @return BelongsTo
      */
     public function StoreNotice(): BelongsTo
     {

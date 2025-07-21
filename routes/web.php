@@ -21,14 +21,11 @@ use Modules\Vendor\Http\Controllers\WithdrawController;
 |
 */
 
-Route::group([], function () {
+Route::group([], function (): void {
     Route::resource('vendor', VendorController::class)->names('vendor');
 });
 
-
-
 Route::get('near-by-shop/{lat}/{lng}', [ShopController::class, 'nearByShop']);
-
 
 Route::apiResource('shops', ShopController::class, [
     'only' => ['index', 'show'],
@@ -38,15 +35,12 @@ Route::post('shop-maintenance-event', [ShopController::class, 'shopMaintenanceEv
 
 Route::get('store-notices', [StoreNoticeController::class, 'index'])->name('store-notices.index');
 
-
-
 /**
  * ******************************************
  * Authorized Route for Customers only
  * ******************************************
  */
-
-Route::group(['middleware' => ['can:' . Permission::CUSTOMER, 'auth:sanctum', 'email.verified']], function () {
+Route::group(['middleware' => ['can:'.Permission::CUSTOMER, 'auth:sanctum', 'email.verified']], function (): void {
     Route::get('/followed-shops-popular-products', [ShopController::class, 'followedShopsPopularProducts']);
     Route::get('/followed-shops', [ShopController::class, 'userFollowedShops']);
     Route::get('/follow-shop', [ShopController::class, 'userFollowedShop']);
@@ -54,17 +48,14 @@ Route::group(['middleware' => ['can:' . Permission::CUSTOMER, 'auth:sanctum', 'e
 
 });
 
-
-
 /**
  * ******************************************
  * Authorized Route for Staff & Store Owner
  * ******************************************
  */
-
 Route::group(
-    ['middleware' => ['permission:' . Permission::STAFF . '|' . Permission::STORE_OWNER, 'auth:sanctum', 'email.verified']],
-    function () {
+    ['middleware' => ['permission:'.Permission::STAFF.'|'.Permission::STORE_OWNER, 'auth:sanctum', 'email.verified']],
+    function (): void {
         // Route::get('shop-notification/{id}', [ShopNotificationController::class, 'show']);
         // Route::put('shop-notification/{id}', [ShopNotificationController::class, 'update']);
         // Route::get('popular-products', [AnalyticsController::class, 'popularProducts']);
@@ -74,7 +65,7 @@ Route::group(
         Route::post('store-notices/read/', [StoreNoticeController::class, 'readNotice']);
         Route::post('store-notices/read-all', [StoreNoticeController::class, 'readAllNotice']);
         Route::apiResource('store-notices', StoreNoticeController::class, [
-            'only' => ['show', 'store', 'update', 'destroy']
+            'only' => ['show', 'store', 'update', 'destroy'],
         ]);
         // Route::get('products-requested-for-flash-sale-by-vendor', [FlashSaleVendorRequestController::class, 'getProductsByFlashSaleVendorRequest']);
         Route::get('requested-products-for-flash-sale', [FlashSaleVendorRequestController::class, 'getRequestedProductsForFlashSale']);
@@ -84,16 +75,14 @@ Route::group(
     }
 );
 
-
 /**
  * *****************************************
  * Authorized Route for Store owner Only
  * *****************************************
  */
-
 Route::group(
-    ['middleware' => ['permission:' . Permission::STORE_OWNER, 'auth:sanctum', 'email.verified']],
-    function () {
+    ['middleware' => ['permission:'.Permission::STORE_OWNER, 'auth:sanctum', 'email.verified']],
+    function (): void {
         Route::apiResource('shops', ShopController::class, [
             'only' => ['store', 'update', 'destroy'],
         ]);
@@ -114,8 +103,7 @@ Route::group(
  * Authorized Route for Super Admin only
  * *****************************************
  */
-
-Route::group(['middleware' => ['permission:' . Permission::SUPER_ADMIN, 'auth:sanctum']], function () {
+Route::group(['middleware' => ['permission:'.Permission::SUPER_ADMIN, 'auth:sanctum']], function (): void {
     Route::apiResource('withdraws', WithdrawController::class, [
         'only' => ['update', 'destroy'],
     ]);
@@ -126,7 +114,7 @@ Route::group(['middleware' => ['permission:' . Permission::SUPER_ADMIN, 'auth:sa
     //     'only' => ['store', 'update', 'destroy'],
     // ]);
     Route::get('new-shops', [ShopController::class, 'newOrInActiveShops']);
-    
+
     // Route::get('requested-products-for-flash-sale', [FlashSaleVendorRequestController::class, 'getRequestedProductsForFlashSale']);
     Route::post('approve-flash-sale-requested-products', [FlashSaleVendorRequestController::class, 'approveFlashSaleProductsRequest']);
     Route::post('disapprove-flash-sale-requested-products', [FlashSaleVendorRequestController::class, 'disapproveFlashSaleProductsRequest']);

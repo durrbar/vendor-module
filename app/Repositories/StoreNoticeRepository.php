@@ -1,13 +1,12 @@
 <?php
 
-
 namespace Modules\Vendor\Repositories;
 
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Modules\Core\Exceptions\DurrbarException;
 use Modules\Core\Repositories\BaseRepository;
-use Modules\Ecommerce\Exceptions\MarvelException;
 use Modules\Role\Enums\Permission;
 use Modules\User\Models\User;
 use Modules\Vendor\Enums\StoreNoticeType;
@@ -15,7 +14,6 @@ use Modules\Vendor\Events\StoreNoticeEvent;
 use Modules\Vendor\Models\Shop;
 use Modules\Vendor\Models\StoreNotice;
 use Modules\Vendor\Traits\StoreNoticeable;
-use Mpdf\Container\NotFoundException;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -28,7 +26,7 @@ class StoreNoticeRepository extends BaseRepository
      * @var array
      */
     protected $fieldSearchable = [
-        'notice'       => 'like',
+        'notice' => 'like',
         'effective_from',
         'expired_at',
         'type',
@@ -50,7 +48,6 @@ class StoreNoticeRepository extends BaseRepository
         'type',
     ];
 
-
     public function boot()
     {
         try {
@@ -69,9 +66,7 @@ class StoreNoticeRepository extends BaseRepository
     }
 
     /**
-     * @param Request $request
-     * @return mixed
-     * @throws MarvelException
+     * @throws DurrbarException
      */
     public function fetchStoreNotices(Request $request): mixed
     {
@@ -82,10 +77,11 @@ class StoreNoticeRepository extends BaseRepository
 
             /* for Guest user Requesting from shop */
 
-            if (!$request->user()) {
+            if (! $request->user()) {
                 $shop_id = $request['shop_id'] ?? 0;
                 if (isset($shop_id)) {
                     $shop = Shop::where('id', $shop_id)->orWhere('slug', $shop_id)->first();
+
                     return $storeNotices
                         ->where([
                             'created_by' => $shop->owner_id ?? 0,
@@ -94,7 +90,7 @@ class StoreNoticeRepository extends BaseRepository
                 }
             }
 
-            if (!$request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
+            if (! $request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
                 /* Block for authenticated user [vendor or staff] */
                 if (isset($request['shop_id'])) {
                     /* code for customers */
@@ -120,6 +116,7 @@ class StoreNoticeRepository extends BaseRepository
             if (isset($request['shop_id'])) {
                 $storeNotices->whereRelation('shops', 'id', $request['shop_id']);
             }
+
             return $storeNotices->whereDate('expired_at', '>=', now());
         } catch (Exception $e) {
             throw new Exception(SOMETHING_WENT_WRONG);
@@ -127,30 +124,32 @@ class StoreNoticeRepository extends BaseRepository
     }
 
     /**
-     * @param Request $request
      * @return array[]
      */
     public function fetchStoreNoticeType(Request $request)
     {
         if ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
             $typeArr = [
-                ['name' => "ALL VENDOR", 'value' => StoreNoticeType::ALL_VENDOR],
-                ['name' => "SPECIFIC VENDOR", 'value' => StoreNoticeType::SPECIFIC_VENDOR]
+                ['name' => 'ALL VENDOR', 'value' => StoreNoticeType::ALL_VENDOR],
+                ['name' => 'SPECIFIC VENDOR', 'value' => StoreNoticeType::SPECIFIC_VENDOR],
             ];
+
             return $typeArr;
         }
         $typeArr = [
-            ['name' => "ALL SHOP", 'value' => StoreNoticeType::ALL_SHOP],
-            ['name' => "SPECIFIC SHOP", 'value' => StoreNoticeType::SPECIFIC_SHOP]
+            ['name' => 'ALL SHOP', 'value' => StoreNoticeType::ALL_SHOP],
+            ['name' => 'SPECIFIC SHOP', 'value' => StoreNoticeType::SPECIFIC_SHOP],
         ];
+
         return $typeArr;
     }
 
     /**
      * This method will generate User list or Shop list based on requested user permission
-     * @param Request $request
+     *
      * @return Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Http\Response
-     * @throws MarvelException
+     *
+     * @throws DurrbarException
      */
     public function fetchUserToSendNotification(Request $request)
     {
@@ -165,12 +164,10 @@ class StoreNoticeRepository extends BaseRepository
         }
     }
 
-
     /**
      * It creates a new store notice, syncs the users and shops, and syncs the read status.
      *
      * @param Request request The request object
-     *
      * @return StoreNotice storeNotice is being returned.
      */
     public function saveStoreNotice(Request $request)
@@ -180,6 +177,7 @@ class StoreNoticeRepository extends BaseRepository
             $this->syncUsersOrShops($request, $storeNotice);
             $this->syncReadStatus($storeNotice);
             event(new StoreNoticeEvent($storeNotice, 'create', $request->user()));
+
             return $storeNotice;
         } catch (Exception $e) {
             throw new HttpException(400, COULD_NOT_CREATE_THE_RESOURCE);
@@ -189,8 +187,8 @@ class StoreNoticeRepository extends BaseRepository
     /**
      * Updating Specific resource in storage
      *
-     * @param \Modules\Ecommerce\Models\StoreNotice $storeNotice
-     * @param array $data
+     * @param  \Modules\Ecommerce\Models\StoreNotice  $storeNotice
+     * @param  array  $data
      * @return mixed
      */
     public function updateStoreNotice(Request $request, StoreNotice $storeNotice)
@@ -201,6 +199,7 @@ class StoreNoticeRepository extends BaseRepository
             $this->syncUsersOrShops($request, $storeNotice);
             $this->syncReadStatus($storeNotice);
             event(new StoreNoticeEvent($storeNotice, 'update', $request->user()));
+
             return $storeNotice;
         } catch (Exception $e) {
             throw new Exception(SOMETHING_WENT_WRONG);

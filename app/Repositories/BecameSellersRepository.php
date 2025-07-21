@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Modules\Vendor\Repositories;
 
 use Modules\Core\Repositories\BaseRepository;
@@ -26,7 +25,7 @@ class BecameSellersRepository extends BaseRepository
 
     // private function getAppSettingsData(): array
     // {
-    //     $config = new MarvelVerification();
+    //     $config = new DurrbarVerification();
     //     $apiData = $config->jsonSerialize();
     //     try {
     //         $licenseKey = $config->getPrivateKey();

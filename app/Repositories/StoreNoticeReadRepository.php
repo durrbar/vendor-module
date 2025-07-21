@@ -1,14 +1,13 @@
 <?php
 
-
 namespace Modules\Vendor\Repositories;
 
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Modules\Core\Exceptions\DurrbarException;
 use Modules\Core\Repositories\BaseRepository;
-use Modules\Ecommerce\Exceptions\MarvelException;
 use Modules\Vendor\Models\StoreNoticeRead;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
@@ -30,7 +29,6 @@ class StoreNoticeReadRepository extends BaseRepository
         'is_read',
     ];
 
-
     public function boot()
     {
         try {
@@ -48,13 +46,13 @@ class StoreNoticeReadRepository extends BaseRepository
         return StoreNoticeRead::class;
     }
 
-
     /**
      * Store or Update a newly created resource in storage.
      * This method will update read_status of a single StoreNotice for requested user { id in requestBody }.
-     * @param Request $request
+     *
      * @return mixed
-     * @throws MarvelException
+     *
+     * @throws DurrbarException
      */
     public function readSingleNotice(Request $request)
     {
@@ -68,13 +66,14 @@ class StoreNoticeReadRepository extends BaseRepository
             $update = $this->updateOrCreate(
                 [
                     'store_notice_id' => $id,
-                    'user_id'         => $request->user()->id,
-                    'is_read'         => true
+                    'user_id' => $request->user()->id,
+                    'is_read' => true,
                 ]
             );
-            if (!$update) {
+            if (! $update) {
                 throw new ModelNotFoundException(NOT_FOUND);
             }
+
             return $update;
         } catch (Exception $e) {
             throw new Exception(SOMETHING_WENT_WRONG);
@@ -84,9 +83,10 @@ class StoreNoticeReadRepository extends BaseRepository
     /**
      * Store or Update resources in storage.
      * This method will update read_status of a multiple StoreNotice for requested user { array of id in requestBody }.
-     * @param Request $request
+     *
      * @return mixed
-     * @throws MarvelException
+     *
+     * @throws DurrbarException
      */
     public function readAllNotice(Request $request)
     {
@@ -100,13 +100,14 @@ class StoreNoticeReadRepository extends BaseRepository
             }
             $insertionArr = Arr::map($noticeIdArr, fn ($noticeId) => [
                 'store_notice_id' => $noticeId,
-                'user_id'         => $userId,
-                'is_read'         => true
+                'user_id' => $userId,
+                'is_read' => true,
             ]);
             $insert = $this->insert($insertionArr);
-            if (!$insert) {
+            if (! $insert) {
                 throw new HttpException(400, NOT_FOUND);
             }
+
             return $this->whereIn('store_notice_id', $noticeIdArr)->where('user_id', $userId)->get();
         } catch (Exception $e) {
             throw new HttpException(400, SOMETHING_WENT_WRONG);

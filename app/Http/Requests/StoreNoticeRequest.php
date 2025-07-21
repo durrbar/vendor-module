@@ -2,12 +2,10 @@
 
 namespace Modules\Vendor\Http\Requests;
 
-use Carbon\Carbon;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
-use Modules\Role\Enums\Permission;
 use Modules\Vendor\Enums\StoreNoticePriority;
 use Modules\Vendor\Enums\StoreNoticeType;
 
@@ -23,19 +21,19 @@ class StoreNoticeRequest extends FormRequest
     /**
      * array Store notice type
      *
-     * @var array $typeArr
+     * @var array
      */
     protected $typeArr = [
         StoreNoticeType::ALL_VENDOR,
         StoreNoticeType::SPECIFIC_VENDOR,
         StoreNoticeType::ALL_SHOP,
-        StoreNoticeType::SPECIFIC_SHOP
+        StoreNoticeType::SPECIFIC_SHOP,
     ];
 
     /**
      * array Store notice Priority
      *
-     * @var array $priorityArr
+     * @var array
      */
     protected $priorityArr = [StoreNoticePriority::HIGH, StoreNoticePriority::MEDIUM, StoreNoticePriority::LOW];
 
@@ -57,14 +55,14 @@ class StoreNoticeRequest extends FormRequest
     public function rules()
     {
         return [
-            'priority'       => ['required', 'string', Rule::in($this->priorityArr)],
-            'notice'         => ['required', 'string'],
-            'description'    => ['nullable', 'string', 'max:10000'],
+            'priority' => ['required', 'string', Rule::in($this->priorityArr)],
+            'notice' => ['required', 'string'],
+            'description' => ['nullable', 'string', 'max:10000'],
             'effective_from' => ['nullable', 'date'],
-            'expired_at'     => ['required', 'date','after:effective_from'],
-            'type'           => ['required', 'string', Rule::in($this->typeArr)],
-            'received_by'    => ['array','required_if: type,' . StoreNoticeType::SPECIFIC_VENDOR . ',' . StoreNoticeType::SPECIFIC_SHOP],
-            'received_by.*'  => ['nullable', 'integer']
+            'expired_at' => ['required', 'date', 'after:effective_from'],
+            'type' => ['required', 'string', Rule::in($this->typeArr)],
+            'received_by' => ['array', 'required_if: type,'.StoreNoticeType::SPECIFIC_VENDOR.','.StoreNoticeType::SPECIFIC_SHOP],
+            'received_by.*' => ['nullable', 'integer'],
         ];
     }
 
@@ -76,14 +74,13 @@ class StoreNoticeRequest extends FormRequest
     public function messages()
     {
         return [
-            'received_by.required_if' => 'Please! Select at least one Specific receiver.'
+            'received_by.required_if' => 'Please! Select at least one Specific receiver.',
         ];
     }
 
     /**
      * Handle a failed validation attempt.
      *
-     * @param Validator $validator
      * @return void
      */
     public function failedValidation(Validator $validator)

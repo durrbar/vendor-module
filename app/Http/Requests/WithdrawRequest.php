@@ -1,13 +1,10 @@
 <?php
 
-
 namespace Modules\Vendor\Http\Requests;
 
-use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Modules\Vendor\Enums\WithdrawStatus;
 
 class WithdrawRequest extends FormRequest
 {
@@ -29,8 +26,8 @@ class WithdrawRequest extends FormRequest
     public function rules()
     {
         return [
-            'shop_id'     => ['required', 'exists:Modules\Vendor\Models\Shop,id'],
-            'amount'   => ['required', 'numeric'],
+            'shop_id' => ['required', 'exists:Modules\Vendor\Models\Shop,id'],
+            'amount' => ['required', 'numeric'],
             'payment_method' => ['nullable', 'string'],
             'details' => ['nullable', 'string'],
             'note' => ['nullable', 'string'],

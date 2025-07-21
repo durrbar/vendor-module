@@ -15,9 +15,6 @@ class Balance extends Model
         'payment_info' => 'json',
     ];
 
-    /**
-     * @return BelongsTo
-     */
     public function shop(): BelongsTo
     {
         return $this->belongsTo(Shop::class, 'shop_id');

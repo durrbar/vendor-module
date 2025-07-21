@@ -1,16 +1,15 @@
 <?php
 
-
 namespace Modules\Vendor\Repositories;
 
 use Exception;
-use Prettus\Repository\Criteria\RequestCriteria;
-use Prettus\Repository\Exceptions\RepositoryException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Ecommerce\Events\FlashSaleProcessed;
 use Modules\Vendor\Models\FlashSale;
 use Modules\Vendor\Models\FlashSaleRequests;
+use Prettus\Repository\Criteria\RequestCriteria;
+use Prettus\Repository\Exceptions\RepositoryException;
 
 class FlashSaleVendorRequestRepository extends BaseRepository
 {
@@ -29,9 +28,8 @@ class FlashSaleVendorRequestRepository extends BaseRepository
         'language',
         'title',
         'note',
-        'flash_sale_id'
+        'flash_sale_id',
     ];
-
 
     public function boot()
     {
@@ -50,11 +48,10 @@ class FlashSaleVendorRequestRepository extends BaseRepository
         return FlashSaleRequests::class;
     }
 
-
     /**
      * storeFlashSaleRequest
      *
-     * @param  mixed $request
+     * @param  mixed  $request
      * @return void
      */
     public function storeFlashSaleRequest($request)
@@ -67,12 +64,12 @@ class FlashSaleVendorRequestRepository extends BaseRepository
             if (isset($request['requested_product_ids'])) {
                 $flash_sale_request->products()->attach($request['requested_product_ids']);
             }
+
             return $flash_sale_request;
         } catch (Exception $th) {
             throw new Exception(SOMETHING_WENT_WRONG, $th->getMessage());
         }
     }
-
 
     public function updateFlashSaleRequest($request, $id)
     {
@@ -90,17 +87,17 @@ class FlashSaleVendorRequestRepository extends BaseRepository
             // }
 
             $flash_sale_request->update($data);
+
             return $flash_sale_request;
         } catch (Exception $e) {
             throw new Exception(SOMETHING_WENT_WRONG, $e->getMessage());
         }
     }
 
-
     /**
      * approveFlashSaleVendorRequestFunc
      *
-     * @param  string $id
+     * @param  string  $id
      * @return void
      */
     public function approveFlashSaleVendorRequestFunc($id)
@@ -114,27 +111,24 @@ class FlashSaleVendorRequestRepository extends BaseRepository
         $products = $flash_sale_request->products;
         // $flash_sale =  FlashSale::where("id", "=", $flash_sale_request->flash_sale_id)->with('products')->first();
 
-
         $attached_products_array = [];
 
         if (isset($products)) {
-            $flash_sale =  FlashSale::with('products')->findOrFail($flash_sale_request->flash_sale_id);
+            $flash_sale = FlashSale::with('products')->findOrFail($flash_sale_request->flash_sale_id);
             foreach ($products as $product) {
                 // Create a new record in the flash_sale_product pivot table
-                if (!in_array($product->id, $flash_sale->products->pluck('id')->toArray())) {
+                if (! in_array($product->id, $flash_sale->products->pluck('id')->toArray())) {
                     $flash_sale->products()->attach($flash_sale_request->flash_sale_id, ['product_id' => $product->id]);
                 }
                 array_push($attached_products_array, $product->id);
             }
         }
 
-
-
         $flash_sale_request->save();
 
         $prepare_flash_sale_data = [
             'attached_product_ids' => $attached_products_array,
-            'requested_flash_sale' => $flash_sale
+            'requested_flash_sale' => $flash_sale,
         ];
 
         event(new FlashSaleProcessed('append_attached_products', DEFAULT_LANGUAGE, $prepare_flash_sale_data));
@@ -142,11 +136,10 @@ class FlashSaleVendorRequestRepository extends BaseRepository
         return $flash_sale_request;
     }
 
-
     /**
      * disapproveFlashSaleVendorRequestFunc
      *
-     * @param  string $id
+     * @param  string  $id
      * @return void
      */
     public function disapproveFlashSaleVendorRequestFunc($id)
@@ -161,12 +154,11 @@ class FlashSaleVendorRequestRepository extends BaseRepository
         $products = $flash_sale_request->products;
         // $flash_sale =  FlashSale::where("id", "=", $flash_sale_request->flash_sale_id)->with('products')->first();
 
-
         $detached_products_array = [];
 
         if (isset($products)) {
             // $flash_sale =  FlashSale::with('products')->findOrFail($flash_sale_request->flash_sale_id);
-            $flash_sale =  FlashSale::with('products')->where("id", "=", $flash_sale_request->flash_sale_id)->first();
+            $flash_sale = FlashSale::with('products')->where('id', '=', $flash_sale_request->flash_sale_id)->first();
             foreach ($products as $product) {
                 // Create a new record in the flash_sale_product pivot table
                 if (in_array($product->id, $flash_sale->products->pluck('id')->toArray())) {
@@ -178,16 +170,14 @@ class FlashSaleVendorRequestRepository extends BaseRepository
             $flash_sale->save();
         }
 
-
         $flash_sale_request->save();
 
         $prepare_flash_sale_data = [
             'detached_product_ids' => $detached_products_array,
-            'requested_flash_sale' => $flash_sale
+            'requested_flash_sale' => $flash_sale,
         ];
 
         event(new FlashSaleProcessed('remove_attached_products', DEFAULT_LANGUAGE, $prepare_flash_sale_data));
-
 
         // $flash_sale_request->save();
         return $flash_sale_request;

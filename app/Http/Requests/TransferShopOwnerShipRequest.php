@@ -1,12 +1,10 @@
 <?php
 
-
 namespace Modules\Vendor\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-
 
 class TransferShopOwnerShipRequest extends FormRequest
 {
@@ -28,9 +26,9 @@ class TransferShopOwnerShipRequest extends FormRequest
     public function rules()
     {
         return [
-            'shop_id'   => ['required', 'exists:Modules\Ecommerce\Models\Shop,id'],
+            'shop_id' => ['required', 'exists:Modules\Ecommerce\Models\Shop,id'],
             'vendor_id' => ['required', 'exists:Modules\Ecommerce\Models\User,id'],
-            'message'   => ['nullable', 'string'],
+            'message' => ['nullable', 'string'],
         ];
     }
 

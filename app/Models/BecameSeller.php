@@ -18,7 +18,7 @@ class BecameSeller extends Model
     {
         $data = static::where('language', $language)->first();
 
-        if (!$data) {
+        if (! $data) {
             $data = static::where('language', DEFAULT_LANGUAGE)->first();
         }
 

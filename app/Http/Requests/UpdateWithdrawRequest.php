@@ -1,12 +1,11 @@
 <?php
 
-
 namespace Modules\Vendor\Http\Requests;
 
-use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 use Modules\Vendor\Enums\WithdrawStatus;
 
 class UpdateWithdrawRequest extends FormRequest
@@ -29,12 +28,12 @@ class UpdateWithdrawRequest extends FormRequest
     public function rules()
     {
         return [
-            'shop_id'     => ['required', 'exists:Modules\Vendor\Models\Shop,id'],
-            'amount'   => ['required', 'numeric'],
+            'shop_id' => ['required', 'exists:Modules\Vendor\Models\Shop,id'],
+            'amount' => ['required', 'numeric'],
             'payment_method' => ['nullable', 'string'],
             'details' => ['nullable', 'string'],
             'note' => ['nullable', 'string'],
-            'status'        => ['required', Rule::in([
+            'status' => ['required', Rule::in([
                 WithdrawStatus::APPROVED,
                 WithdrawStatus::PROCESSING,
                 WithdrawStatus::REJECTED,

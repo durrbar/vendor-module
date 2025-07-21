@@ -5,7 +5,6 @@ namespace Modules\Vendor\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Ecommerce\Models\Product;
 
@@ -17,9 +16,6 @@ class FlashSaleRequests extends Model
 
     public $guarded = [];
 
-    /**
-     * @return BelongsTo
-     */
     public function flash_sale(): BelongsTo
     {
         return $this->belongsTo(FlashSale::class, 'flash_sale_id');
@@ -27,11 +23,9 @@ class FlashSaleRequests extends Model
 
     /**
      * products
-     *
-     * @return BelongsToMany
      */
-    public function  products(): BelongsToMany
+    public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class, "flash_sale_requests_products");
+        return $this->belongsToMany(Product::class, 'flash_sale_requests_products');
     }
 }

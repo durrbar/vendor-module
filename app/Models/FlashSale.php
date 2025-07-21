@@ -3,8 +3,8 @@
 namespace Modules\Vendor\Models;
 
 use Cviebrock\EloquentSluggable\Sluggable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -13,7 +13,9 @@ use Modules\Ecommerce\Traits\TranslationTrait;
 
 class FlashSale extends Model
 {
-    use TranslationTrait, SoftDeletes, Sluggable;
+    use Sluggable;
+    use SoftDeletes;
+    use TranslationTrait;
 
     protected $table = 'flash_sales';
 
@@ -22,22 +24,20 @@ class FlashSale extends Model
     public $guarded = [];
 
     protected $casts = [
-        'cover_image'  => 'json',
+        'cover_image' => 'json',
         'sale_builder' => 'json',
-        'image'        => 'json'
+        'image' => 'json',
     ];
 
     /**
      * Return the sluggable configuration array for this model.
-     *
-     * @return array
      */
     public function sluggable(): array
     {
         return [
             'slug' => [
                 'source' => 'title',
-            ]
+            ],
         ];
     }
 
@@ -46,17 +46,11 @@ class FlashSale extends Model
         return $query->where('language', $model->language);
     }
 
-    /**
-     * @return BelongsToMany
-     */
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'flash_sale_products')->withPivot('flash_sale_id', 'product_id');
     }
 
-    /**
-     * @return HasMany
-     */
     public function flashSaleRequests(): HasMany
     {
         return $this->hasMany(FlashSaleRequests::class);

@@ -2,16 +2,13 @@
 
 namespace Modules\Vendor\Http\Controllers;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Modules\Ecommerce\Models\Address;
-use Modules\Ecommerce\Exceptions\MarvelException;
 use Illuminate\Support\Facades\Cache;
+use Modules\Core\Exceptions\DurrbarException;
 use Modules\Core\Http\Controllers\CoreController;
-use Modules\Ecommerce\Models\Commission;
-use Modules\Ecommerce\Http\Requests\CommissionRequest;
+use Modules\Ecommerce\Models\Address;
 use Modules\Vendor\Http\Requests\BecameSellersRequest;
 use Modules\Vendor\Repositories\BecameSellersRepository;
 use Modules\Vendor\Repositories\CommissionRepository;
@@ -20,6 +17,7 @@ use Prettus\Validator\Exceptions\ValidatorException;
 class BecameSellerController extends CoreController
 {
     public $repository;
+
     public $commission;
 
     public function __construct(BecameSellersRepository $repository, CommissionRepository $commission)
@@ -28,22 +26,21 @@ class BecameSellerController extends CoreController
         $this->commission = $commission;
     }
 
-
     /**
      * Display a listing of the resource.
      *
-     * @param Request $request
      * @return Collection|Address[]
      */
     public function index(Request $request)
     {
         $language = $request->language ? $request->language : DEFAULT_LANGUAGE;
+
         return Cache::rememberForever(
-            'cached_became_seller_' . $language,
+            'cached_became_seller_'.$language,
             function () use ($request) {
                 return [
                     'page_options' => $this->repository->getData($request->language),
-                    'commissions' => $this->commission->get()
+                    'commissions' => $this->commission->get(),
                 ];
             }
         );
@@ -52,40 +49,39 @@ class BecameSellerController extends CoreController
     /**
      * Store a newly created resource in storage.
      *
-     * @param BecameSellersRequest $request
      * @return mixed
+     *
      * @throws ValidatorException
      */
-
     public function store(BecameSellersRequest $request)
     {
         $language = $request->language ? $request->language : DEFAULT_LANGUAGE;
-        if (Cache::has('cached_became_seller_' . $language)) {
-            Cache::forget('cached_became_seller_' . $language);
+        if (Cache::has('cached_became_seller_'.$language)) {
+            Cache::forget('cached_became_seller_'.$language);
         }
 
         $request->merge([
             'page_options' => [
                 ...$request->page_options,
-            ]
+            ],
         ]);
-        
+
         $this->commission->storeCommission($request['commissions'], $language);
 
         $data = $this->repository->where('language', $request->language)->first();
         if ($data) {
-            
-            $becomeSeller =  tap($data)->update($request->only(['page_options']));
+
+            $becomeSeller = tap($data)->update($request->only(['page_options']));
         } else {
-            $becomeSeller =  $this->repository->create(['page_options' => $request['page_options'], 'language' => $language]);
+            $becomeSeller = $this->repository->create(['page_options' => $request['page_options'], 'language' => $language]);
         }
+
         return $becomeSeller;
     }
 
     /**
      * Display the specified resource.
      *
-     * @param $id
      * @return JsonResponse
      */
     public function show($id)
@@ -93,16 +89,16 @@ class BecameSellerController extends CoreController
         try {
             return $this->repository->first();
         } catch (\Exception $e) {
-            throw new MarvelException(NOT_FOUND);
+            throw new DurrbarException(NOT_FOUND);
         }
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param BecameSellersRequest $request
-     * @param int $id
+     * @param  int  $id
      * @return JsonResponse
+     *
      * @throws ValidatorException
      */
     public function update(BecameSellersRequest $request, $id)
@@ -118,11 +114,11 @@ class BecameSellerController extends CoreController
     /**
      * Remove the specified resource from storage.
      *
-     * @param int $id
+     * @param  int  $id
      * @return array
      */
     public function destroy($id)
     {
-        throw new MarvelException(ACTION_NOT_VALID);
+        throw new DurrbarException(ACTION_NOT_VALID);
     }
 }

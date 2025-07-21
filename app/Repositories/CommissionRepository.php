@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Modules\Vendor\Repositories;
 
 use Carbon\Carbon;
@@ -21,22 +20,22 @@ class CommissionRepository extends BaseRepository
     {
         $this->deleteCommission($commissionItems, $language);
 
-        foreach ($commissionItems as $key => $commissionItem) {
+        foreach ($commissionItems as $commissionItem) {
             $commissionExists = $this->where('id', $commissionItem['id'])->exists();
 
             $commissionData = [
-                "level" => $commissionItem['level'],
-                "sub_level" => $commissionItem['sub_level'],
-                "description" => $commissionItem['description'],
-                "min_balance" => $commissionItem['min_balance'],
-                "max_balance" => $commissionItem['max_balance'],
-                "commission" => $commissionItem['commission'],
-                "image" => json_encode($commissionItem['image']),
+                'level' => $commissionItem['level'],
+                'sub_level' => $commissionItem['sub_level'],
+                'description' => $commissionItem['description'],
+                'min_balance' => $commissionItem['min_balance'],
+                'max_balance' => $commissionItem['max_balance'],
+                'commission' => $commissionItem['commission'],
+                'image' => json_encode($commissionItem['image']),
                 'language' => $language,
-                "updated_at" => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ];
 
-            if (!$commissionExists) {
+            if (! $commissionExists) {
                 $commissionData['created_at'] = Carbon::now();
                 $this->insert($commissionData);
             } else {
@@ -45,7 +44,8 @@ class CommissionRepository extends BaseRepository
         }
     }
 
-    public function deleteCommission($commissionItems, $language) {
+    public function deleteCommission($commissionItems, $language)
+    {
         // Get all commission IDs from the request
         $commissionIdsInRequest = array_column($commissionItems, 'id');
 
@@ -56,10 +56,8 @@ class CommissionRepository extends BaseRepository
         $commissionsToDelete = array_diff($existingCommissionIds, $commissionIdsInRequest);
 
         // Delete commissions that need to be removed
-        if (!empty($commissionsToDelete)) {
+        if (! empty($commissionsToDelete)) {
             $this->whereIn('id', $commissionsToDelete)->delete();
         }
     }
-
-
 }

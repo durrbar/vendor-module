@@ -15,7 +15,6 @@ use Modules\Ecommerce\Models\Conversation;
 use Modules\Ecommerce\Models\Faqs;
 use Modules\Ecommerce\Models\Product;
 use Modules\Ecommerce\Models\TermsAndConditions;
-use Modules\Ecommerce\Models\Withdraw;
 use Modules\Order\Models\Order;
 use Modules\User\Models\User;
 
@@ -36,101 +35,66 @@ class Shop extends Model
 
     /**
      * Return the sluggable configuration array for this model.
-     *
-     * @return array
      */
     public function sluggable(): array
     {
         return [
             'slug' => [
-                'source' => 'name'
-            ]
+                'source' => 'name',
+            ],
         ];
     }
 
-    /**
-     * @return HasOne
-     */
     public function balance(): HasOne
     {
         return $this->hasOne(Balance::class, 'shop_id');
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
     }
 
-    /**
-     * @return HasMany
-     */
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class, 'shop_id');
     }
 
-    /**
-     * @return HasMany
-     */
     public function attributes(): HasMany
     {
         return $this->hasMany(Attribute::class, 'shop_id');
     }
 
-    /**
-     * @return HasMany
-     */
     public function products(): HasMany
     {
         return $this->hasMany(Product::class, 'shop_id');
     }
 
-    /**
-     * @return HasMany
-     */
     public function withdraws(): HasMany
     {
         return $this->hasMany(Withdraw::class, 'shop_id');
     }
 
-    /**
-     * @return HasMany
-     */
     public function staffs(): HasMany
     {
         return $this->hasMany(User::class, 'shop_id');
     }
 
-    /**
-     * @return HasMany
-     */
     public function refunds(): HasMany
     {
         return $this->hasMany(User::class, 'shop_id');
     }
 
-    /**
-     * @return BelongsToMany
-     */
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'category_shop');
     }
 
-    /**
-     * @return BelongsToMany
-     */
     public function users(): BelongsToMany
     {
         return $this->BelongsToMany(User::class, 'user_shop');
     }
 
-    /**
-     * @return HasMany
-     */
     public function conversations(): HasMany
     {
         return $this->hasMany(Conversation::class, 'shop_id');
@@ -138,8 +102,6 @@ class Shop extends Model
 
     /**
      * faqs
-     *
-     * @return HasMany
      */
     public function faqs(): HasMany
     {
@@ -148,26 +110,22 @@ class Shop extends Model
 
     /**
      * terms and conditions
-     *
-     * @return HasMany
      */
     public function terms_and_conditions(): HasMany
     {
         return $this->HasMany(TermsAndConditions::class);
     }
+
     /**
      * faqs
-     *
-     * @return HasMany
      */
     public function coupons(): HasMany
     {
         return $this->HasMany(Coupon::class);
     }
+
     /**
      * ownership transfers
-     *
-     * @return HasOne
      */
     public function ownership_history(): HasOne
     {

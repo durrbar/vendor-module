@@ -8,8 +8,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Modules\Core\Exceptions\DurrbarException;
 use Modules\Core\Http\Controllers\CoreController;
-use Modules\Ecommerce\Exceptions\MarvelException;
 use Modules\Role\Enums\Permission;
 use Modules\Vendor\Enums\StoreNoticeType;
 use Modules\Vendor\Http\Requests\StoreNoticeRequest;
@@ -24,6 +24,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class StoreNoticeController extends CoreController
 {
     public $repository;
+
     private $repositoryPivot;
 
     public function __construct(StoreNoticeRepository $repository, StoreNoticeReadRepository $repositoryPivot)
@@ -32,9 +33,7 @@ class StoreNoticeController extends CoreController
         $this->repositoryPivot = $repositoryPivot;
     }
 
-
     /**
-     * @param Request $request
      * @return LengthAwarePaginator|Collection|mixed
      */
     public function index(Request $request)
@@ -43,16 +42,17 @@ class StoreNoticeController extends CoreController
             $limit = $request->limit ? $request->limit : 15;
             $storeNotices = $this->fetchStoreNotices($request)->paginate($limit);
             $data = StoreNoticeResource::collection($storeNotices)->response()->getData(true);
+
             return formatAPIResourcePaginate($data);
-        } catch (MarvelException $th) {
-            throw new MarvelException(SOMETHING_WENT_WRONG, $th->getMessage());
+        } catch (DurrbarException $th) {
+            throw new DurrbarException(SOMETHING_WENT_WRONG, $th->getMessage());
         }
     }
 
     /**
-     * @param Request $request
      * @return StoreNoticeRepository
-     * @throws MarvelException
+     *
+     * @throws DurrbarException
      */
     public function fetchStoreNotices(Request $request)
     {
@@ -62,8 +62,8 @@ class StoreNoticeController extends CoreController
     /**
      * Store a newly created resource in storage.
      *
-     * @param StoreNoticeRequest $request
      * @return LengthAwarePaginator|Collection|mixed
+     *
      * @throws ValidatorException
      */
     public function store(StoreNoticeRequest $request)
@@ -73,13 +73,12 @@ class StoreNoticeController extends CoreController
                 return $this->repository->saveStoreNotice($request);
             }
             throw new AuthorizationException(NOT_AUTHORIZED);
-        } catch (MarvelException $th) {
-            throw new MarvelException(SOMETHING_WENT_WRONG);
+        } catch (DurrbarException $th) {
+            throw new DurrbarException(SOMETHING_WENT_WRONG);
         }
     }
 
     /**
-     * @param Request $request
      * @return array|array[]
      */
     public function getStoreNoticeType(Request $request)
@@ -89,61 +88,64 @@ class StoreNoticeController extends CoreController
 
     /**
      * This method will generate User list or Shop list based on requested user permission
-     * @param Request $request
+     *
      * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
-     * @throws MarvelException
+     *
+     * @throws DurrbarException
      */
     public function getUsersToNotify(Request $request)
     {
-        $typeArr = array(StoreNoticeType::ALL_SHOP, StoreNoticeType::ALL_VENDOR);
+        $typeArr = [StoreNoticeType::ALL_SHOP, StoreNoticeType::ALL_VENDOR];
         if (in_array($request->type, $typeArr)) {
             throw new HttpException(400, ACTION_NOT_VALID);
         }
+
         return $this->repository->fetchUserToSendNotification($request);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
-     * @throws MarvelException
+     * @param  int  $id
+     *
+     * @throws DurrbarException
      */
     public function show(Request $request, $id)
     {
         try {
             $storeNotice = $this->repository->findOrFail($id);
+
             // return $storeNotice;
             return new GetSingleStoreNoticeResource($storeNotice);
-        } catch (MarvelException $th) {
-            throw new MarvelException(SOMETHING_WENT_WRONG);
+        } catch (DurrbarException $th) {
+            throw new DurrbarException(SOMETHING_WENT_WRONG);
         }
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param StoreNoticeUpdateRequest $request
-     * @param $id
      * @return StoreNotice
-     * @throws MarvelException
+     *
+     * @throws DurrbarException
      */
     public function update(StoreNoticeUpdateRequest $request, $id)
     {
         try {
             $request['id'] = $id;
+
             return $this->updateStoreNotice($request);
-        } catch (MarvelException $th) {
-            throw new MarvelException(SOMETHING_WENT_WRONG);
+        } catch (DurrbarException $th) {
+            throw new DurrbarException(SOMETHING_WENT_WRONG);
         }
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
      * @return StoreNotice
-     * @throws MarvelException
+     *
+     * @throws DurrbarException
      */
     public function updateStoreNotice(Request $request)
     {
@@ -151,6 +153,7 @@ class StoreNoticeController extends CoreController
         try {
             if ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN) || $this->repository->hasPermission($request->user(), $request->received_by[0] ?? 0)) {
                 $storeNotice = $this->repository->findOrFail($id);
+
                 return $this->repository->updateStoreNotice($request, $storeNotice);
             }
             throw new AuthorizationException(NOT_AUTHORIZED);
@@ -161,32 +164,35 @@ class StoreNoticeController extends CoreController
 
     /**
      * Remove the specified resource from storage.
-     * @param Request $request
-     * @param $id
+     *
      * @return bool
-     * @throws MarvelException
+     *
+     * @throws DurrbarException
      */
     public function destroy(Request $request, $id)
     {
 
         try {
             $request['id'] = $id ?? 0;
+
             return $this->deleteStoreNotice($request);
-        } catch (MarvelException $th) {
-            throw new MarvelException(COULD_NOT_DELETE_THE_RESOURCE);
+        } catch (DurrbarException $th) {
+            throw new DurrbarException(COULD_NOT_DELETE_THE_RESOURCE);
         }
     }
 
     /**
      * Remove the specified resource from storage.
-     * @param Request $request
+     *
      * @return mixed
-     * @throws MarvelException
+     *
+     * @throws DurrbarException
      */
     public function deleteStoreNotice(Request $request)
     {
         try {
             $id = $request->id;
+
             return $this->repository->findOrFail($id)->forceDelete();
         } catch (Exception $e) {
             throw new HttpException(400, COULD_NOT_DELETE_THE_RESOURCE);
@@ -196,28 +202,31 @@ class StoreNoticeController extends CoreController
     /**
      *  Update the specified resource in storage.
      * This method will update read_status of a single StoreNotice for requested user { id in requestBody }.
-     * @param Request $request 
+     *
      * @return JsonResponse|null
-     * @throws MarvelException
+     *
+     * @throws DurrbarException
      */
     public function readNotice(Request $request)
     {
         try {
             $request->validate([
-                'id' => 'required|exists:Modules\Ecommerce\Models\StoreNotice,id'
+                'id' => 'required|exists:Modules\Ecommerce\Models\StoreNotice,id',
             ]);
+
             return $this->repositoryPivot->readSingleNotice($request);
-        } catch (MarvelException $th) {
-            throw new MarvelException(SOMETHING_WENT_WRONG);
+        } catch (DurrbarException $th) {
+            throw new DurrbarException(SOMETHING_WENT_WRONG);
         }
     }
 
     /**
      *  Update or Store resources in storage.
      * This method will update read_status of a multiple StoreNotice for requested user { array of id in requestBody }.
-     * @param Request $request 
+     *
      * @return JsonResponse|null
-     * @throws MarvelException
+     *
+     * @throws DurrbarException
      */
     public function readAllNotice(Request $request)
     {
@@ -226,9 +235,10 @@ class StoreNoticeController extends CoreController
                 'notices' => 'required|array|min:1',
                 'notices.*' => 'exists:Modules\Ecommerce\Models\StoreNotice,id',
             ]);
+
             return $this->repositoryPivot->readAllNotice($request);
-        } catch (MarvelException $th) {
-            throw new MarvelException(SOMETHING_WENT_WRONG);
+        } catch (DurrbarException $th) {
+            throw new DurrbarException(SOMETHING_WENT_WRONG);
         }
     }
 }
