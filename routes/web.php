@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Role\Enums\Permission;
 use Modules\Vendor\Http\Controllers\BecameSellerController;
+use Modules\Vendor\Http\Controllers\FlashSaleController;
 use Modules\Vendor\Http\Controllers\FlashSaleVendorRequestController;
 use Modules\Vendor\Http\Controllers\OwnershipTransferController;
 use Modules\Vendor\Http\Controllers\ShopController;
@@ -34,6 +35,10 @@ Route::apiResource('shops', ShopController::class, [
 Route::post('shop-maintenance-event', [ShopController::class, 'shopMaintenanceEvent']);
 
 Route::get('store-notices', [StoreNoticeController::class, 'index'])->name('store-notices.index');
+
+Route::apiResource('flash-sale', FlashSaleController::class, [
+    'only' => ['index', 'show'],
+]);
 
 /**
  * ******************************************
@@ -72,6 +77,8 @@ Route::group(
         Route::apiResource('vendor-requests-for-flash-sale', FlashSaleVendorRequestController::class, [
             'only' => ['index', 'show', 'store', 'destroy'],
         ]);
+        
+        Route::get('products-by-flash-sale', [FlashSaleController::class, 'getProductsByFlashSale']);
     }
 );
 
@@ -95,6 +102,12 @@ Route::group(
         Route::apiResource('ownership-transfer', OwnershipTransferController::class, [
             'only' => ['index', 'show'],
         ]);
+
+        Route::apiResource('flash-sale', FlashSaleController::class, [
+            'only' => ['store', 'update', 'destroy'],
+        ]);
+
+        Route::get('product-flash-sale-info', [FlashSaleController::class, 'getFlashSaleInfoByProductID']);
     }
 );
 
