@@ -4,14 +4,15 @@ namespace Modules\Vendor\Models;
 
 use Attribute;
 use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Modules\Chat\Models\Conversation;
 use Modules\Coupon\Models\Coupon;
 use Modules\Ecommerce\Models\Category;
-use Modules\Ecommerce\Models\Conversation;
 use Modules\Ecommerce\Models\Faqs;
 use Modules\Ecommerce\Models\Product;
 use Modules\Ecommerce\Models\TermsAndConditions;
@@ -20,6 +21,7 @@ use Modules\User\Models\User;
 
 class Shop extends Model
 {
+    use HasUuids;
     use Sluggable;
 
     protected $table = 'shops';

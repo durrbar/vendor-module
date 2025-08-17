@@ -4,6 +4,7 @@ namespace Modules\Vendor\Models;
 
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,6 +14,7 @@ use Modules\Ecommerce\Traits\TranslationTrait;
 
 class FlashSale extends Model
 {
+    use HasUuids;
     use Sluggable;
     use SoftDeletes;
     use TranslationTrait;

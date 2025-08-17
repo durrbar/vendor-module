@@ -2,12 +2,15 @@
 
 namespace Modules\Vendor\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Modules\User\Models\User;
 
 class StoreNoticeRead extends Pivot
 {
+    use HasUuids;
+    
     public $guarded = [];
 
     public $with = ['user'];

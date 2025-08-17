@@ -2,10 +2,13 @@
 
 namespace Modules\Vendor\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 class BecameSeller extends Model
 {
+    use HasUuids;
+    
     protected $table = 'became_sellers';
 
     public $guarded = [];
