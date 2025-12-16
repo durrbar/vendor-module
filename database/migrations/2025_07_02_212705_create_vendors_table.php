@@ -45,5 +45,36 @@ return new class () extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('vendors');
+
+        if (Schema::hasTable('attributes')) {
+            Schema::table('attributes', function (Blueprint $table): void {
+                if (Schema::hasColumn('attributes', 'shop_id')) {
+                    $table->dropForeign(['shop_id']);
+                    $table->dropColumn('shop_id');
+                }
+            });
+        }
+
+        if (Schema::hasTable('products')) {
+            Schema::table('products', function (Blueprint $table): void {
+                if (Schema::hasColumn('products', 'shop_id')) {
+                    $table->dropForeign(['shop_id']);
+                    $table->dropColumn('shop_id');
+                }
+            });
+        }
+
+        if (Schema::hasTable('orders')) {
+            Schema::table('orders', function (Blueprint $table): void {
+                if (Schema::hasColumn('orders', 'shop_id')) {
+                    $table->dropForeign(['shop_id']);
+                    $table->dropColumn('shop_id');
+                }
+                if (Schema::hasColumn('orders', 'parent_id')) {
+                    $table->dropForeign(['parent_id']);
+                    $table->dropColumn('parent_id');
+                }
+            });
+        }
     }
 };

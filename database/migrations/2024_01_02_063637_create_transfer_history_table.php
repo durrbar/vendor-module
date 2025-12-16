@@ -37,8 +37,11 @@ return new class () extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('ownership_transfers');
-        Schema::table('products', function (Blueprint $table): void {
-            $table->dropColumn('visibility');
-        });
+
+        if (Schema::hasTable('prosucts')) {
+            Schema::table('products', function (Blueprint $table): void {
+                $table->dropColumn('visibility');
+            });
+        }
     }
 };

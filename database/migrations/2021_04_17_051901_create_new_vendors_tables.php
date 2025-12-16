@@ -81,10 +81,23 @@ return new class () extends Migration {
      */
     public function down()
     {
+        if (Schema::hasTable('users')) {
+            Schema::table('users', function (Blueprint $table): void {
+                if (Schema::hasColumn('users', 'shop_id')) {
+                    $table->dropForeign(['shop_id']);
+                    $table->dropColumn('shop_id');
+                }
+            });
+        }
+
         Schema::dropIfExists('withdraws');
         Schema::dropIfExists('store_settings');
         Schema::dropIfExists('variation_options');
-        Schema::dropIfExists('tags');
-        Schema::dropIfExists('cards');
+        Schema::dropIfExists('category_shop');
+        Schema::dropIfExists('user_shop');
+        Schema::dropIfExists('balances');
+        Schema::dropIfExists('shops');
+        // Schema::dropIfExists('tags');
+        // Schema::dropIfExists('cards');
     }
 };

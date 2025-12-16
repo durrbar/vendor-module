@@ -50,9 +50,9 @@ return new class () extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('store_notices');
         Schema::dropIfExists('store_notice_user');
         Schema::dropIfExists('store_notice_shop');
         Schema::dropIfExists('store_notice_read');
+        Schema::dropIfExists('store_notices');
     }
 };
