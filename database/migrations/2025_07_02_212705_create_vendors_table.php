@@ -1,18 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
+return new class() extends Migration
+{
     /**
      * Run the migrations.
      */
     public function up(): void
     {
         Schema::table('attributes', function (Blueprint $table): void {
-            $table->uuid('shop_id')->nullable()->after('name');
-            $table->foreign('shop_id')->references('id')->on('shops')->onDelete('cascade');
+            $table->foreignUuid('shop_id')->nullable()->after('name')->constrained()->cascadeOnDelete();
         });
 
         Schema::table('attribute_values', function (Blueprint $table): void {
@@ -24,14 +26,11 @@ return new class () extends Migration {
         });
 
         Schema::table('products', function (Blueprint $table): void {
-            $table->uuid('shop_id')->after('price')->nullable();
-            $table->foreign('shop_id')->references('id')->on('shops')->onDelete('cascade');
+            $table->foreignUuid('shop_id')->after('price')->nullable()->constrained()->cascadeOnDelete();
         });
         Schema::table('orders', function (Blueprint $table): void {
-            $table->uuid('shop_id')->after('coupon_id')->nullable();
-            $table->foreign('shop_id')->references('id')->on('shops')->onDelete('cascade');
-            $table->uuid('parent_id')->after('coupon_id')->nullable();
-            $table->foreign('parent_id')->references('id')->on('orders')->onDelete('cascade');
+            $table->foreignUuid('shop_id')->after('coupon_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignUuid('parent_id')->after('coupon_id')->nullable()->constrained('orders')->cascadeOnDelete();
         });
 
         Schema::table('users', function (Blueprint $table): void {

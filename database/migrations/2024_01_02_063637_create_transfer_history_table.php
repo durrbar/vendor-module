@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Modules\Ecommerce\Enums\DefaultStatusType;
 use Modules\Ecommerce\Enums\ProductVisibilityStatus;
 
-return new class () extends Migration {
+return new class() extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -15,11 +18,11 @@ return new class () extends Migration {
         Schema::create('ownership_transfers', function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->string('transaction_identifier', 50);
-            $table->foreignUuid('from')->constrained('users', 'id')->cascadeOnDelete();
-            $table->foreignUuid('shop_id')->constrained('shops', 'id')->cascadeOnDelete();
-            $table->foreignUuid('to')->constrained('users', 'id')->cascadeOnDelete();
+            $table->foreignUuid('from')->constrained('users')->cascadeOnDelete();
+            $table->foreignUuid('to')->constrained('users')->cascadeOnDelete();
+            $table->foreignUuid('created_by')->constrained('users')->cascadeOnDelete();
+            $table->foreignUuid('shop_id')->constrained()->cascadeOnDelete();
             $table->text('message')->nullable();
-            $table->foreignUuid('created_by')->constrained('users', 'id')->cascadeOnDelete();
             $table->enum('status', DefaultStatusType::getValues())->default(DefaultStatusType::PENDING);
             $table->timestamps();
             $table->softDeletes();
