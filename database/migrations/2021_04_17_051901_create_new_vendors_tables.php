@@ -87,7 +87,6 @@ return new class() extends Migration
 
         Schema::dropIfExists('withdraws');
         Schema::dropIfExists('store_settings');
-        Schema::dropIfExists('variation_options');
         Schema::dropIfExists('category_shop');
         Schema::dropIfExists('user_shop');
         Schema::dropIfExists('balances');
