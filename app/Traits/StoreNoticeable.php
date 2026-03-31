@@ -18,10 +18,14 @@ trait StoreNoticeable
      */
     public function syncReadStatus(StoreNotice $storeNotice)
     {
+        $creator = $storeNotice->relationLoaded('creator')
+            ? $storeNotice->getRelation('creator')
+            : $storeNotice->creator()->first();
+
         $userIdArr = match ($storeNotice->type) {
             StoreNoticeType::ALL_VENDOR => User::permission(Permission::STORE_OWNER)->get()->pluck('id'),
-            StoreNoticeType::ALL_SHOP => $storeNotice->creator->shops->pluck('id'),
-            StoreNoticeType::SPECIFIC_SHOP => $storeNotice->shops->pluck('id'),
+            StoreNoticeType::ALL_SHOP => $creator ? $creator->shops()->pluck('id') : collect(),
+            StoreNoticeType::SPECIFIC_SHOP => $storeNotice->shops()->pluck('id'),
             StoreNoticeType::SPECIFIC_VENDOR => $storeNotice->users()->pluck('id'),
         };
         $storeNoticeReadArray = Arr::map(
@@ -44,6 +48,10 @@ trait StoreNoticeable
      */
     protected function syncUsersOrShops(Request $request, StoreNotice $storeNotice)
     {
+        $creator = $storeNotice->relationLoaded('creator')
+            ? $storeNotice->getRelation('creator')
+            : $storeNotice->creator()->first();
+
         switch ($request->type) {
             case StoreNoticeType::ALL_VENDOR:
                 $request->received_by = User::permission(Permission::STORE_OWNER)->pluck('id');
@@ -53,7 +61,7 @@ trait StoreNoticeable
                 $storeNotice->users()->sync($request->received_by);
                 break;
             case StoreNoticeType::ALL_SHOP:
-                $request->received_by = $storeNotice->creator->shops->pluck('id');
+                $request->received_by = $creator ? $creator->shops()->pluck('id') : collect();
                 $storeNotice->shops()->sync($request->received_by);
                 break;
             case StoreNoticeType::SPECIFIC_SHOP:

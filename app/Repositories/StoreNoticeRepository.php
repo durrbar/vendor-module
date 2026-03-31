@@ -100,12 +100,13 @@ class StoreNoticeRepository extends BaseRepository
                         ->where([
                             'created_by' => $shop->owner_id ?? 0,
                         ])->whereRelation('shops', 'id', $shop_id);
-                } elseif ($request->user()->managed_shop) {
+                } elseif ($request->user()->managed_shop()->exists()) {
                     /* Block for staff notices */
-                    $shop_id = $request->user()->managed_shop->id ?? 0;
+                    $managedShop = $request->user()->managed_shop()->first();
+                    $shop_id = $managedShop?->id ?? 0;
                     $storeNotices
                         ->where([
-                            'created_by' => $request->user()->managed_shop->owner_id ?? 0,
+                            'created_by' => $managedShop?->owner_id ?? 0,
                         ])->whereRelation('shops', 'id', $shop_id);
                 } else {
                     /* Block for Store owner notices */
@@ -157,7 +158,7 @@ class StoreNoticeRepository extends BaseRepository
             if ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
                 return User::permission(Permission::STORE_OWNER)->orderBy('name')->get();
             } else {
-                return $request->user()->shops->where('is_active', 1);
+                return $request->user()->shops()->where('is_active', 1)->get();
             }
         } catch (Exception $e) {
             throw new Exception(SOMETHING_WENT_WRONG);

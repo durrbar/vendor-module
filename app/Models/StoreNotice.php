@@ -67,31 +67,48 @@ class StoreNotice extends Model
 
     public function getCreatorRoleAttribute(): string
     {
-        try {
-            $permissionArr = $this->creator->permissions->pluck('name')->toArray();
-            if (in_array(Permission::SUPER_ADMIN, $permissionArr)) {
-                return ucfirst(str_replace('_', ' ', Permission::SUPER_ADMIN));
-            }
+        $creator = $this->relationLoaded('creator')
+            ? $this->getRelation('creator')
+            : $this->creator()->with('permissions')->first();
 
-            return ucfirst(str_replace('_', ' ', Permission::STORE_OWNER));
-        } catch (\Throwable $th) {
+        if (! $creator) {
             return '';
         }
+
+        $permissions = $creator->relationLoaded('permissions')
+            ? $creator->getRelation('permissions')
+            : $creator->permissions()->get();
+
+        $permissionArr = $permissions->pluck('name')->toArray();
+
+        if (in_array(Permission::SUPER_ADMIN, $permissionArr)) {
+            return ucfirst(str_replace('_', ' ', Permission::SUPER_ADMIN));
+        }
+
+        return ucfirst(str_replace('_', ' ', Permission::STORE_OWNER));
     }
 
     public function getIsReadAttribute(): bool
     {
-        try {
-            $readStatusArr = $this->read_status;
-            foreach ($readStatusArr as $readStatus) {
-                if ($readStatus->id === Auth::id() && $readStatus->pivot->is_read) {
+        $authenticatedUserId = Auth::id();
+
+        if (! $authenticatedUserId) {
+            return false;
+        }
+
+        if ($this->relationLoaded('read_status')) {
+            foreach ($this->getRelation('read_status') as $readStatus) {
+                if ($readStatus->id === $authenticatedUserId && $readStatus->pivot?->is_read) {
                     return true;
                 }
             }
 
             return false;
-        } catch (\Throwable $th) {
-            return false;
         }
+
+        return $this->read_status()
+            ->where('users.id', $authenticatedUserId)
+            ->wherePivot('is_read', true)
+            ->exists();
     }
 }

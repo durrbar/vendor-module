@@ -48,7 +48,7 @@ class WithdrawController extends CoreController
             $user = $request->user();
             $shop_id = isset($request['shop_id']) && $request['shop_id'] != 'undefined' ? $request['shop_id'] : false;
             if ($shop_id) {
-                if ($user->shops->contains('id', $shop_id)) {
+                if ($user->shops()->where('id', $shop_id)->exists()) {
                     return $this->repository->with(['shop'])->where('shop_id', '=', $shop_id);
                 } elseif ($user && $user->hasPermissionTo(Permission::SUPER_ADMIN)) {
                     return $this->repository->with(['shop'])->where('shop_id', '=', $shop_id);
@@ -77,7 +77,7 @@ class WithdrawController extends CoreController
     public function store(WithdrawRequest $request)
     {
         try {
-            if ($request->user() && ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN) || $request->user()->shops->contains('id', $request->shop_id))) {
+            if ($request->user() && ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN) || $request->user()->shops()->where('id', $request->shop_id)->exists())) {
                 $validatedData = $request->validated();
                 if (! isset($validatedData['shop_id'])) {
                     throw new BadRequestHttpException(WITHDRAW_MUST_BE_ATTACHED_TO_SHOP);
@@ -118,7 +118,7 @@ class WithdrawController extends CoreController
         try {
             $id = $request->id;
             $withdraw = $this->repository->with(['shop'])->findOrFail($id);
-            if ($request->user() && ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN) || $request->user()->shops->contains('id', $withdraw->shop_id))) {
+            if ($request->user() && ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN) || $request->user()->shops()->where('id', $withdraw->shop_id)->exists())) {
                 return $withdraw;
             }
             throw new AuthorizationException(NOT_AUTHORIZED);

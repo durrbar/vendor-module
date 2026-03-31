@@ -56,7 +56,7 @@ class StoreNoticeController extends CoreController
      */
     public function fetchStoreNotices(Request $request)
     {
-        return $this->repository->whereNotNull('id');
+        return $this->repository->with(['creator', 'users', 'shops', 'read_status'])->whereNotNull('id');
     }
 
     /**
@@ -113,7 +113,7 @@ class StoreNoticeController extends CoreController
     public function show(Request $request, $id)
     {
         try {
-            $storeNotice = $this->repository->findOrFail($id);
+            $storeNotice = $this->repository->with(['creator', 'users', 'shops', 'read_status'])->findOrFail($id);
 
             // return $storeNotice;
             return new GetSingleStoreNoticeResource($storeNotice);

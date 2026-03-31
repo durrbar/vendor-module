@@ -81,7 +81,7 @@ class ShopController extends CoreController
         $shop = $this->repository
             ->with(['categories', 'owner', 'ownership_history'])
             ->withCount(['orders', 'products']);
-        if ($request->user() && ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN) || $request->user()->shops->contains('slug', $slug))) {
+        if ($request->user() && ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN) || $request->user()->shops()->where('slug', $slug)->exists())) {
             $shop = $shop->with('balance');
         }
         try {
@@ -114,7 +114,7 @@ class ShopController extends CoreController
     public function updateShop(Request $request)
     {
         $id = $request->id;
-        if ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN) || ($request->user()->hasPermissionTo(Permission::STORE_OWNER) && ($request->user()->shops->contains($id)))) {
+        if ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN) || ($request->user()->hasPermissionTo(Permission::STORE_OWNER) && $request->user()->shops()->where('id', $id)->exists())) {
             return $this->repository->updateShop($request, $id);
         }
         throw new AuthorizationException(NOT_AUTHORIZED);
@@ -150,7 +150,7 @@ class ShopController extends CoreController
     public function deleteShop(Request $request)
     {
         $id = $request->id;
-        if ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN) || ($request->user()->hasPermissionTo(Permission::STORE_OWNER) && ($request->user()->shops->contains($id)))) {
+        if ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN) || ($request->user()->hasPermissionTo(Permission::STORE_OWNER) && $request->user()->shops()->where('id', $id)->exists())) {
             try {
                 $shop = $this->repository->findOrFail($id);
             } catch (\Exception $e) {
@@ -267,7 +267,7 @@ class ShopController extends CoreController
         } catch (\Exception $e) {
             throw new ModelNotFoundException(NOT_FOUND);
         }
-        if ($request->user()->hasPermissionTo(Permission::STORE_OWNER) || ($request->user()->hasPermissionTo(Permission::STORE_OWNER) && ($request->user()->shops->contains('id', $staff->shop_id)))) {
+        if ($request->user()->hasPermissionTo(Permission::STORE_OWNER) || ($request->user()->hasPermissionTo(Permission::STORE_OWNER) && $request->user()->shops()->where('id', $staff->shop_id)->exists())) {
             $staff->delete();
 
             return $staff;

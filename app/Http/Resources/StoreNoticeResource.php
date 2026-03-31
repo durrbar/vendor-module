@@ -25,10 +25,10 @@ class StoreNoticeResource extends Resource
             'expired_at' => $this->expired_at,
             'creator_role' => $this->creator_role,
             'is_read' => $this->is_read,
-            'creator' => ['id' => $this->creator->id, 'name' => $this->creator->name, 'email' => $this->creator->email],
-            'users' => getResourceCollection($this->users, ['email']),
-            'shops' => getResourceCollection($this->shops),
-            'read_status' => $this->readStatusRecourseData($this->read_status),
+            'creator' => $this->whenLoaded('creator', fn () => ['id' => $this->creator->id, 'name' => $this->creator->name, 'email' => $this->creator->email], ['id' => null, 'name' => null, 'email' => null]),
+            'users' => $this->whenLoaded('users', fn () => getResourceCollection($this->users, ['email']), []),
+            'shops' => $this->whenLoaded('shops', fn () => getResourceCollection($this->shops), []),
+            'read_status' => $this->whenLoaded('read_status', fn () => $this->readStatusRecourseData($this->read_status), []),
         ];
     }
 
