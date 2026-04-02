@@ -7,6 +7,7 @@ namespace Modules\Vendor\Http\Controllers;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -23,7 +24,7 @@ use Modules\Vendor\Repositories\StoreNoticeRepository;
 use Prettus\Validator\Exceptions\ValidatorException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-final class StoreNoticeController extends CoreController
+class StoreNoticeController extends CoreController
 {
     public $repository;
 
@@ -91,7 +92,7 @@ final class StoreNoticeController extends CoreController
     /**
      * This method will generate User list or Shop list based on requested user permission
      *
-     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
+     * @return Builder[]|\Illuminate\Database\Eloquent\Collection
      *
      * @throws DurrbarException
      */

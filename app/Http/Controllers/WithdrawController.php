@@ -21,7 +21,7 @@ use Prettus\Validator\Exceptions\ValidatorException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-final class WithdrawController extends CoreController
+class WithdrawController extends CoreController
 {
     public $repository;
 

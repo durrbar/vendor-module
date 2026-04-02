@@ -7,7 +7,7 @@ namespace Modules\Vendor\Observers;
 use Illuminate\Support\Facades\Auth;
 use Modules\Vendor\Models\StoreNotice;
 
-final class StoreNoticeObserver
+class StoreNoticeObserver
 {
     public function creating(StoreNotice $storeNotice): void
     {

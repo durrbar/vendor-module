@@ -15,7 +15,7 @@ use Modules\Vendor\Models\OwnershipTransfer;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
 
-final class OwnershipTransferRepository extends BaseRepository
+class OwnershipTransferRepository extends BaseRepository
 {
     /**
      * @var array

@@ -11,7 +11,7 @@ use Illuminate\Validation\Rules\Enum;
 use Modules\Vendor\Enums\StoreNoticePriority;
 use Modules\Vendor\Enums\StoreNoticeType;
 
-final class StoreNoticeRequest extends FormRequest
+class StoreNoticeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

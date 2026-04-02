@@ -16,7 +16,7 @@ use Modules\Role\Enums\Permission;
 use Modules\Vendor\Events\OwnershipTransferStatusControl;
 use Modules\Vendor\Repositories\OwnershipTransferRepository;
 
-final class OwnershipTransferController extends CoreController
+class OwnershipTransferController extends CoreController
 {
     public $repository;
 

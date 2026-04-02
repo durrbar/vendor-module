@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Events;
 
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -57,7 +60,7 @@ class StoreNoticeEvent implements ShouldBroadcast, ShouldQueue
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
+     * @return array<int, Channel>
      */
     public function broadcastOn(): array
     {
@@ -65,7 +68,7 @@ class StoreNoticeEvent implements ShouldBroadcast, ShouldQueue
         if (isset($this->storeNotice->users)) {
             foreach ($this->storeNotice->users as $user) {
                 $channel_name = new PrivateChannel('store_notice.created.'.$user->id);
-                array_push($event_channels, $channel_name);
+                $event_channels[] = $channel_name;
             }
         }
 
@@ -108,7 +111,7 @@ class StoreNoticeEvent implements ShouldBroadcast, ShouldQueue
             }
 
             if (isset($settings->options['pushNotification']['all']['storeNotice'])) {
-                if ($settings->options['pushNotification']['all']['storeNotice'] == true && $this->action = 'create') {
+                if ($settings->options['pushNotification']['all']['storeNotice'] === true && $this->action = 'create') {
                     $enableBroadCast = true;
                 }
             }

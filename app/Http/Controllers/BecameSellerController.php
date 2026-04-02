@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Http\Controllers;
 
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -88,7 +91,7 @@ class BecameSellerController extends CoreController
     {
         try {
             return $this->repository->first();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new DurrbarException(NOT_FOUND);
         }
     }
@@ -106,9 +109,10 @@ class BecameSellerController extends CoreController
         $settings = $this->repository->first();
         if (isset($settings->id)) {
             return $this->repository->update($request->only(['page_options']), $settings->id);
-        } else {
-            return $this->repository->create(['page_options' => $request['page_options']]);
         }
+
+        return $this->repository->create(['page_options' => $request['page_options']]);
+
     }
 
     /**

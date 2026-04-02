@@ -7,7 +7,7 @@ namespace Modules\Vendor\Observers;
 use Illuminate\Support\Facades\Auth;
 use Modules\Vendor\Models\OwnershipTransfer;
 
-final class OwnershipTransferObserver
+class OwnershipTransferObserver
 {
     public function creating(OwnershipTransfer $ownershipTransfer): void
     {

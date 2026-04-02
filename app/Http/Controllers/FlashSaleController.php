@@ -19,7 +19,7 @@ use Modules\Vendor\Http\Requests\UpdateFlashSaleRequest;
 use Modules\Vendor\Repositories\FlashSaleRepository;
 use Prettus\Validator\Exceptions\ValidatorException;
 
-final class FlashSaleController extends CoreController
+class FlashSaleController extends CoreController
 {
     public $repository;
 

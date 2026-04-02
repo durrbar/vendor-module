@@ -1,30 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
+#[Table('became_sellers')]
+#[Unguarded]
 class BecameSeller extends Model
 {
     use HasUuids;
-    
-    protected $table = 'became_sellers';
-
-    public $guarded = [];
-
-    protected $casts = [
-        'page_options' => 'json',
-    ];
 
     public static function getData($language = DEFAULT_LANGUAGE)
     {
-        $data = static::where('language', $language)->first();
+        $data = self::where('language', $language)->first();
 
         if (! $data) {
-            $data = static::where('language', DEFAULT_LANGUAGE)->first();
+            $data = self::where('language', DEFAULT_LANGUAGE)->first();
         }
 
         return $data;
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'page_options' => 'json',
+        ];
     }
 }

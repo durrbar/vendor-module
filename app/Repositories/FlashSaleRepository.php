@@ -14,7 +14,7 @@ use Modules\Vendor\Models\FlashSale;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
 
-final class FlashSaleRepository extends BaseRepository
+class FlashSaleRepository extends BaseRepository
 {
     /**
      * @var array

@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Modules\Vendor\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,20 +18,15 @@ use Modules\User\Models\User;
 use Modules\Vendor\Observers\StoreNoticeObserver;
 
 #[ObservedBy([StoreNoticeObserver::class])]
-final class StoreNotice extends Model
+#[Table('store_notices')]
+#[Unguarded]
+#[Appends(['is_read', 'creator_role'])]
+class StoreNotice extends Model
 {
     use HasUlids;
     use SoftDeletes;
 
-    public $guarded = [];
-
     public $with = ['creator', 'users', 'shops', 'read_status'];
-
-    protected $table = 'store_notices';
-
-    protected $appends = [
-        'is_read', 'creator_role',
-    ];
 
     public function creator(): BelongsTo
     {

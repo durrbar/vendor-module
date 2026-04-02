@@ -21,7 +21,7 @@ use Modules\Vendor\Models\FlashSale;
 use Modules\Vendor\Repositories\FlashSaleVendorRequestRepository;
 use Prettus\Validator\Exceptions\ValidatorException;
 
-final class FlashSaleVendorRequestController extends CoreController
+class FlashSaleVendorRequestController extends CoreController
 {
     public $repository;
 

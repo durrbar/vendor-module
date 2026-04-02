@@ -6,7 +6,9 @@ namespace Modules\Vendor\Repositories;
 
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Modules\Core\Exceptions\DurrbarException;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Role\Enums\Permission;
@@ -20,7 +22,7 @@ use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-final class StoreNoticeRepository extends BaseRepository
+class StoreNoticeRepository extends BaseRepository
 {
     use StoreNoticeable;
 
@@ -150,7 +152,7 @@ final class StoreNoticeRepository extends BaseRepository
     /**
      * This method will generate User list or Shop list based on requested user permission
      *
-     * @return Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Http\Response
+     * @return Builder[]|Collection|Response
      *
      * @throws DurrbarException
      */

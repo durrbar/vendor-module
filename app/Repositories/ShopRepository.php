@@ -22,7 +22,7 @@ use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-final class ShopRepository extends BaseRepository
+class ShopRepository extends BaseRepository
 {
     /**
      * @var array

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Repositories;
 
 use Exception;
@@ -104,7 +106,7 @@ class FlashSaleVendorRequestRepository extends BaseRepository
     {
         try {
             $flash_sale_request = $this->findOrFail($id);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ModelNotFoundException(NOT_FOUND);
         }
         $flash_sale_request->request_status = true;
@@ -120,7 +122,7 @@ class FlashSaleVendorRequestRepository extends BaseRepository
                 if (! in_array($product->id, $flash_sale->products->pluck('id')->toArray())) {
                     $flash_sale->products()->attach($flash_sale_request->flash_sale_id, ['product_id' => $product->id]);
                 }
-                array_push($attached_products_array, $product->id);
+                $attached_products_array[] = $product->id;
             }
         }
 
@@ -146,7 +148,7 @@ class FlashSaleVendorRequestRepository extends BaseRepository
     {
         try {
             $flash_sale_request = $this->findOrFail($id);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ModelNotFoundException(NOT_FOUND);
         }
 
@@ -164,7 +166,7 @@ class FlashSaleVendorRequestRepository extends BaseRepository
                 if (in_array($product->id, $flash_sale->products->pluck('id')->toArray())) {
                     $flash_sale->products()->detach($product->id);
                 }
-                array_push($detached_products_array, $product->id);
+                $detached_products_array[] = $product->id;
             }
 
             $flash_sale->save();

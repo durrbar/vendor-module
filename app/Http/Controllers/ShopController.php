@@ -29,7 +29,7 @@ use Modules\Vendor\Models\Shop;
 use Modules\Vendor\Repositories\ShopRepository;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-final class ShopController extends CoreController
+class ShopController extends CoreController
 {
     use OrderStatusManagerWithPaymentTrait;
 

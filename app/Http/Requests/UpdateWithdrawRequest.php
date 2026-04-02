@@ -10,7 +10,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rules\Enum;
 use Modules\Vendor\Enums\WithdrawStatus;
 
-final class UpdateWithdrawRequest extends FormRequest
+class UpdateWithdrawRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
