@@ -2,15 +2,17 @@
 
 namespace Modules\Vendor\Models;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Core\Models\Scopes\OrderByCreatedAtDescScope;
 use Modules\User\Models\User;
 use Modules\Vendor\Observers\OwnershipTransferObserver;
 
+#[ScopedBy([OrderByCreatedAtDescScope::class])]
 #[ObservedBy([OwnershipTransferObserver::class])]
 class OwnershipTransfer extends Model
 {
@@ -20,16 +22,6 @@ class OwnershipTransfer extends Model
     protected $table = 'ownership_transfers';
 
     public $guarded = [];
-
-    public static function boot(): void
-    {
-        parent::boot();
-
-        static::addGlobalScope('order', function (Builder $builder): void {
-            $builder->orderBy('created_at', 'desc');
-        });
-
-    }
 
     public function previous_owner(): belongsTo
     {
