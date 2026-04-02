@@ -52,7 +52,7 @@ class StoreNoticeRepository extends BaseRepository
         'type',
     ];
 
-    public function boot()
+    public function boot(): void
     {
         try {
             $this->pushCriteria(app(RequestCriteria::class));
@@ -64,7 +64,7 @@ class StoreNoticeRepository extends BaseRepository
     /**
      * Configure the Model
      **/
-    public function model()
+    public function model(): string
     {
         return StoreNotice::class;
     }

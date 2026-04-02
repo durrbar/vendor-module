@@ -13,7 +13,7 @@ class CommissionRepository extends BaseRepository
     /**
      * Configure the Model
      **/
-    public function model()
+    public function model(): string
     {
         return Commission::class;
     }

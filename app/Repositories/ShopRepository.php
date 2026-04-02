@@ -49,7 +49,7 @@ class ShopRepository extends BaseRepository
         'notifications',
     ];
 
-    public function boot()
+    public function boot(): void
     {
         try {
             $this->pushCriteria(app(RequestCriteria::class));
@@ -61,7 +61,7 @@ class ShopRepository extends BaseRepository
     /**
      * Configure the Model
      **/
-    public function model()
+    public function model(): string
     {
         return Shop::class;
     }

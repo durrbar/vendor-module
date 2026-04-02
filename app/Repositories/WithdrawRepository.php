@@ -18,7 +18,7 @@ class WithdrawRepository extends BaseRepository
         'shop_id',
     ];
 
-    public function boot()
+    public function boot(): void
     {
         try {
             $this->pushCriteria(app(RequestCriteria::class));
@@ -29,7 +29,7 @@ class WithdrawRepository extends BaseRepository
     /**
      * Configure the Model
      **/
-    public function model()
+    public function model(): string
     {
         return Withdraw::class;
     }

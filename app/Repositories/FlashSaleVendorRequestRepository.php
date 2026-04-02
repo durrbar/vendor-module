@@ -33,7 +33,7 @@ class FlashSaleVendorRequestRepository extends BaseRepository
         'flash_sale_id',
     ];
 
-    public function boot()
+    public function boot(): void
     {
         try {
             $this->pushCriteria(app(RequestCriteria::class));
@@ -45,7 +45,7 @@ class FlashSaleVendorRequestRepository extends BaseRepository
     /**
      * Configure the Model
      **/
-    public function model()
+    public function model(): string
     {
         return FlashSaleRequests::class;
     }
