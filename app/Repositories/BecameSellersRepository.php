@@ -12,7 +12,7 @@ class BecameSellersRepository extends BaseRepository
     /**
      * Configure the Model
      **/
-    public function model()
+    public function model(): string
     {
         return BecameSeller::class;
     }
