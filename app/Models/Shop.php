@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Models;
 
-use Attribute;
 use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Modules\Chat\Models\Conversation;
 use Modules\Coupon\Models\Coupon;
+use Modules\Ecommerce\Models\Attribute as ProductAttribute;
 use Modules\Ecommerce\Models\Category;
 use Modules\Ecommerce\Models\Faqs;
 use Modules\Ecommerce\Models\Product;
@@ -19,21 +23,12 @@ use Modules\Ecommerce\Models\TermsAndConditions;
 use Modules\Order\Models\Order;
 use Modules\User\Models\User;
 
+#[Table('shops')]
+#[Unguarded]
 class Shop extends Model
 {
     use HasUuids;
     use Sluggable;
-
-    protected $table = 'shops';
-
-    public $guarded = [];
-
-    protected $casts = [
-        'logo' => 'json',
-        'cover_image' => 'json',
-        'address' => 'json',
-        'settings' => 'json',
-    ];
 
     /**
      * Return the sluggable configuration array for this model.
@@ -64,7 +59,7 @@ class Shop extends Model
 
     public function attributes(): HasMany
     {
-        return $this->hasMany(Attribute::class, 'shop_id');
+        return $this->hasMany(ProductAttribute::class, 'shop_id');
     }
 
     public function products(): HasMany
@@ -94,7 +89,7 @@ class Shop extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->BelongsToMany(User::class, 'user_shop');
+        return $this->belongsToMany(User::class, 'user_shop');
     }
 
     public function conversations(): HasMany
@@ -107,7 +102,7 @@ class Shop extends Model
      */
     public function faqs(): HasMany
     {
-        return $this->HasMany(Faqs::class);
+        return $this->hasMany(Faqs::class);
     }
 
     /**
@@ -115,7 +110,7 @@ class Shop extends Model
      */
     public function terms_and_conditions(): HasMany
     {
-        return $this->HasMany(TermsAndConditions::class);
+        return $this->hasMany(TermsAndConditions::class);
     }
 
     /**
@@ -123,7 +118,7 @@ class Shop extends Model
      */
     public function coupons(): HasMany
     {
-        return $this->HasMany(Coupon::class);
+        return $this->hasMany(Coupon::class);
     }
 
     /**
@@ -132,5 +127,15 @@ class Shop extends Model
     public function ownership_history(): HasOne
     {
         return $this->hasOne(OwnershipTransfer::class, 'shop_id');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'logo' => 'json',
+            'cover_image' => 'json',
+            'address' => 'json',
+            'settings' => 'json',
+        ];
     }
 }
