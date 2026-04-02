@@ -3,13 +3,15 @@
 namespace Modules\Vendor\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Auth;
 use Modules\User\Models\User;
+use Modules\Vendor\Observers\OwnershipTransferObserver;
 
+#[ObservedBy([OwnershipTransferObserver::class])]
 class OwnershipTransfer extends Model
 {
     use HasUuids;
@@ -27,10 +29,6 @@ class OwnershipTransfer extends Model
             $builder->orderBy('created_at', 'desc');
         });
 
-        static::creating(function ($ownershipTransfer): void {
-            $ownershipTransfer->transaction_identifier = static::generateTracker();
-            $ownershipTransfer->created_by = Auth::id();
-        });
     }
 
     public function previous_owner(): belongsTo

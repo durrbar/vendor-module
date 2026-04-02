@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Modules\Vendor\Models;
 
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Auth;
 use Modules\Role\Enums\Permission;
 use Modules\User\Models\User;
+use Modules\Vendor\Observers\StoreNoticeObserver;
 
+#[ObservedBy([StoreNoticeObserver::class])]
 final class StoreNotice extends Model
 {
     use HasUlids;
@@ -27,20 +29,6 @@ final class StoreNotice extends Model
     protected $appends = [
         'is_read', 'creator_role',
     ];
-
-    /**
-     * parent boot menu from parent model
-     */
-    public static function boot(): void
-    {
-        parent::boot();
-        self::creating(function ($storeNotice): void {
-            $storeNotice->created_by = Auth::id();
-        });
-        self::updating(function ($storeNotice): void {
-            $storeNotice->updated_by = Auth::id();
-        });
-    }
 
     public function creator(): BelongsTo
     {
