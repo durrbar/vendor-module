@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Repositories;
 
 use Exception;
@@ -18,7 +20,7 @@ use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class StoreNoticeRepository extends BaseRepository
+final class StoreNoticeRepository extends BaseRepository
 {
     use StoreNoticeable;
 
@@ -90,7 +92,7 @@ class StoreNoticeRepository extends BaseRepository
                 }
             }
 
-            if (! $request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
+            if (! $request->user()->hasPermissionTo(Permission::SuperAdmin->value)) {
                 /* Block for authenticated user [vendor or staff] */
                 if (isset($request['shop_id'])) {
                     /* code for customers */
@@ -129,17 +131,17 @@ class StoreNoticeRepository extends BaseRepository
      */
     public function fetchStoreNoticeType(Request $request)
     {
-        if ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
+        if ($request->user()->hasPermissionTo(Permission::SuperAdmin->value)) {
             $typeArr = [
-                ['name' => 'ALL VENDOR', 'value' => StoreNoticeType::ALL_VENDOR],
-                ['name' => 'SPECIFIC VENDOR', 'value' => StoreNoticeType::SPECIFIC_VENDOR],
+                ['name' => 'ALL VENDOR', 'value' => StoreNoticeType::AllVendor->value],
+                ['name' => 'SPECIFIC VENDOR', 'value' => StoreNoticeType::SpecificVendor->value],
             ];
 
             return $typeArr;
         }
         $typeArr = [
-            ['name' => 'ALL SHOP', 'value' => StoreNoticeType::ALL_SHOP],
-            ['name' => 'SPECIFIC SHOP', 'value' => StoreNoticeType::SPECIFIC_SHOP],
+            ['name' => 'ALL SHOP', 'value' => StoreNoticeType::AllShop->value],
+            ['name' => 'SPECIFIC SHOP', 'value' => StoreNoticeType::SpecificShop->value],
         ];
 
         return $typeArr;
@@ -155,11 +157,12 @@ class StoreNoticeRepository extends BaseRepository
     public function fetchUserToSendNotification(Request $request)
     {
         try {
-            if ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
-                return User::permission(Permission::STORE_OWNER)->orderBy('name')->get();
-            } else {
-                return $request->user()->shops()->where('is_active', 1)->get();
+            if ($request->user()->hasPermissionTo(Permission::SuperAdmin->value)) {
+                return User::permission(Permission::StoreOwner->value)->orderBy('name')->get();
             }
+
+            return $request->user()->shops()->where('is_active', 1)->get();
+
         } catch (Exception $e) {
             throw new Exception(SOMETHING_WENT_WRONG);
         }

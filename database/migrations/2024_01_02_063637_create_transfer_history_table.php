@@ -23,14 +23,14 @@ return new class() extends Migration
             $table->foreignUuid('created_by')->constrained('users')->cascadeOnDelete();
             $table->foreignUuid('shop_id')->constrained()->cascadeOnDelete();
             $table->text('message')->nullable();
-            $table->enum('status', DefaultStatusType::getValues())->default(DefaultStatusType::PENDING);
+            $table->enum('status', DefaultStatusType::cases())->default(DefaultStatusType::Pending->value);
             $table->timestamps();
             $table->softDeletes();
             $table->index(['id', 'transaction_identifier', 'created_at']);
         });
 
         Schema::table('products', function (Blueprint $table): void {
-            $table->enum('visibility', ProductVisibilityStatus::getValues())->after('status')->default(ProductVisibilityStatus::VISIBILITY_PUBLIC);
+            $table->enum('visibility', ProductVisibilityStatus::cases())->after('status')->default(ProductVisibilityStatus::VisibilityPublic->value);
         });
     }
 

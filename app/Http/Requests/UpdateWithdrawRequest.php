@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 use Modules\Vendor\Enums\WithdrawStatus;
 
-class UpdateWithdrawRequest extends FormRequest
+final class UpdateWithdrawRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -33,13 +35,7 @@ class UpdateWithdrawRequest extends FormRequest
             'payment_method' => ['nullable', 'string'],
             'details' => ['nullable', 'string'],
             'note' => ['nullable', 'string'],
-            'status' => ['required', Rule::in([
-                WithdrawStatus::APPROVED,
-                WithdrawStatus::PROCESSING,
-                WithdrawStatus::REJECTED,
-                WithdrawStatus::PENDING,
-                WithdrawStatus::ON_HOLD,
-            ])],
+            'status' => ['required', new Enum(WithdrawStatus::class)],
         ];
     }
 

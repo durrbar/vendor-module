@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Http\Controllers;
 
 use Illuminate\Auth\Access\AuthorizationException;
@@ -17,7 +19,7 @@ use Modules\Vendor\Http\Requests\UpdateFlashSaleRequest;
 use Modules\Vendor\Repositories\FlashSaleRepository;
 use Prettus\Validator\Exceptions\ValidatorException;
 
-class FlashSaleController extends CoreController
+final class FlashSaleController extends CoreController
 {
     public $repository;
 
@@ -143,7 +145,7 @@ class FlashSaleController extends CoreController
     {
         try {
             $user = $request->user();
-            if ($user && ($user->hasPermissionTo(Permission::SUPER_ADMIN) || $user->hasPermissionTo(Permission::STORE_OWNER) || $user->hasPermissionTo(Permission::STAFF))) {
+            if ($user && ($user->hasPermissionTo(Permission::SuperAdmin->value) || $user->hasPermissionTo(Permission::StoreOwner->value) || $user->hasPermissionTo(Permission::Staff->value))) {
                 $flashSale = $this->repository->findOrFail($request->id);
                 $flashSale->delete();
 

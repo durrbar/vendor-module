@@ -1,17 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Enums;
 
-use BenSampo\Enum\Enum;
-
-/**
- * Class StoreNoticePriority
- */
-final class StoreNoticePriority extends Enum
+enum StoreNoticePriority: string
 {
-    public const HIGH = 'high';
-
-    public const MEDIUM = 'medium';
-
-    public const LOW = 'low';
+    case High = 'high';
+    case Medium = 'medium';
+    case Low = 'low';
 }

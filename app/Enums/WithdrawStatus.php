@@ -1,21 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Enums;
 
-use BenSampo\Enum\Enum;
-
-/**
- * Class RoleType
- */
-final class WithdrawStatus extends Enum
+enum WithdrawStatus: string
 {
-    public const APPROVED = 'approved';
-
-    public const PENDING = 'pending';
-
-    public const ON_HOLD = 'on_hold';
-
-    public const REJECTED = 'rejected';
-
-    public const PROCESSING = 'processing';
+    case Approved = 'approved';
+    case Pending = 'pending';
+    case OnHold = 'on_hold';
+    case Rejected = 'rejected';
+    case Processing = 'processing';
 }

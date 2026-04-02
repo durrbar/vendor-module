@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Traits;
 
 use Illuminate\Http\Request;
@@ -23,10 +25,10 @@ trait StoreNoticeable
             : $storeNotice->creator()->first();
 
         $userIdArr = match ($storeNotice->type) {
-            StoreNoticeType::ALL_VENDOR => User::permission(Permission::STORE_OWNER)->get()->pluck('id'),
-            StoreNoticeType::ALL_SHOP => $creator ? $creator->shops()->pluck('id') : collect(),
-            StoreNoticeType::SPECIFIC_SHOP => $storeNotice->shops()->pluck('id'),
-            StoreNoticeType::SPECIFIC_VENDOR => $storeNotice->users()->pluck('id'),
+            StoreNoticeType::AllVendor->value => User::permission(Permission::StoreOwner->value)->get()->pluck('id'),
+            StoreNoticeType::AllShop->value => $creator ? $creator->shops()->pluck('id') : collect(),
+            StoreNoticeType::SpecificShop->value => $storeNotice->shops()->pluck('id'),
+            StoreNoticeType::SpecificVendor->value => $storeNotice->users()->pluck('id'),
         };
         $storeNoticeReadArray = Arr::map(
             $userIdArr->toArray(),
@@ -53,18 +55,18 @@ trait StoreNoticeable
             : $storeNotice->creator()->first();
 
         switch ($request->type) {
-            case StoreNoticeType::ALL_VENDOR:
-                $request->received_by = User::permission(Permission::STORE_OWNER)->pluck('id');
+            case StoreNoticeType::AllVendor->value:
+                $request->received_by = User::permission(Permission::StoreOwner->value)->pluck('id');
                 $storeNotice->users()->sync($request->received_by);
                 break;
-            case StoreNoticeType::SPECIFIC_VENDOR:
+            case StoreNoticeType::SpecificVendor->value:
                 $storeNotice->users()->sync($request->received_by);
                 break;
-            case StoreNoticeType::ALL_SHOP:
+            case StoreNoticeType::AllShop->value:
                 $request->received_by = $creator ? $creator->shops()->pluck('id') : collect();
                 $storeNotice->shops()->sync($request->received_by);
                 break;
-            case StoreNoticeType::SPECIFIC_SHOP:
+            case StoreNoticeType::SpecificShop->value:
                 $storeNotice->shops()->sync($request->received_by);
                 break;
         }

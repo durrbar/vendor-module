@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Repositories;
 
 use Carbon\Carbon;
@@ -13,7 +15,7 @@ use Modules\Vendor\Models\OwnershipTransfer;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
 
-class OwnershipTransferRepository extends BaseRepository
+final class OwnershipTransferRepository extends BaseRepository
 {
     /**
      * @var array
@@ -56,10 +58,10 @@ class OwnershipTransferRepository extends BaseRepository
             ->whereIn(
                 'order_status',
                 [
-                    OrderStatus::PENDING,
-                    OrderStatus::PROCESSING,
-                    OrderStatus::AT_LOCAL_FACILITY,
-                    OrderStatus::OUT_FOR_DELIVERY,
+                    OrderStatus::Pending->value,
+                    OrderStatus::Processing->value,
+                    OrderStatus::AtLocalFacility->value,
+                    OrderStatus::OutForDelivery->value,
                 ]
             )->count();
 
@@ -112,14 +114,14 @@ class OwnershipTransferRepository extends BaseRepository
             ->pluck('order_count', 'order_status');
 
         return [
-            'pending' => $query[OrderStatus::PENDING] ?? 0,
-            'processing' => $query[OrderStatus::PROCESSING] ?? 0,
-            'complete' => $query[OrderStatus::COMPLETED] ?? 0,
-            'cancelled' => $query[OrderStatus::CANCELLED] ?? 0,
-            'refunded' => $query[OrderStatus::REFUNDED] ?? 0,
-            'failed' => $query[OrderStatus::FAILED] ?? 0,
-            'localFacility' => $query[OrderStatus::AT_LOCAL_FACILITY] ?? 0,
-            'outForDelivery' => $query[OrderStatus::OUT_FOR_DELIVERY] ?? 0,
+            'pending' => $query[OrderStatus::Pending->value] ?? 0,
+            'processing' => $query[OrderStatus::Processing->value] ?? 0,
+            'complete' => $query[OrderStatus::Completed->value] ?? 0,
+            'cancelled' => $query[OrderStatus::Cancelled->value] ?? 0,
+            'refunded' => $query[OrderStatus::Refunded->value] ?? 0,
+            'failed' => $query[OrderStatus::Failed->value] ?? 0,
+            'localFacility' => $query[OrderStatus::AtLocalFacility->value] ?? 0,
+            'outForDelivery' => $query[OrderStatus::OutForDelivery->value] ?? 0,
         ];
     }
 

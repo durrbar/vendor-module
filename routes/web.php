@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\Route;
 use Modules\Role\Enums\Permission;
 use Modules\Vendor\Http\Controllers\BecameSellerController;
@@ -45,7 +47,7 @@ Route::apiResource('flash-sale', FlashSaleController::class, [
  * Authorized Route for Customers only
  * ******************************************
  */
-Route::group(['middleware' => ['can:'.Permission::CUSTOMER, 'auth:sanctum', 'email.verified']], function (): void {
+Route::group(['middleware' => ['can:'.Permission::Customer->value, 'auth:sanctum', 'email.verified']], function (): void {
     Route::get('/followed-shops-popular-products', [ShopController::class, 'followedShopsPopularProducts']);
     Route::get('/followed-shops', [ShopController::class, 'userFollowedShops']);
     Route::get('/follow-shop', [ShopController::class, 'userFollowedShop']);
@@ -59,7 +61,7 @@ Route::group(['middleware' => ['can:'.Permission::CUSTOMER, 'auth:sanctum', 'ema
  * ******************************************
  */
 Route::group(
-    ['middleware' => ['permission:'.Permission::STAFF.'|'.Permission::STORE_OWNER, 'auth:sanctum', 'email.verified']],
+    ['middleware' => ['permission:'.Permission::Staff->value.'|'.Permission::StoreOwner->value, 'auth:sanctum', 'email.verified']],
     function (): void {
         // Route::get('shop-notification/{id}', [ShopNotificationController::class, 'show']);
         // Route::put('shop-notification/{id}', [ShopNotificationController::class, 'update']);
@@ -77,7 +79,7 @@ Route::group(
         Route::apiResource('vendor-requests-for-flash-sale', FlashSaleVendorRequestController::class, [
             'only' => ['index', 'show', 'store', 'destroy'],
         ]);
-        
+
         Route::get('products-by-flash-sale', [FlashSaleController::class, 'getProductsByFlashSale']);
     }
 );
@@ -88,7 +90,7 @@ Route::group(
  * *****************************************
  */
 Route::group(
-    ['middleware' => ['permission:'.Permission::STORE_OWNER, 'auth:sanctum', 'email.verified']],
+    ['middleware' => ['permission:'.Permission::StoreOwner->value, 'auth:sanctum', 'email.verified']],
     function (): void {
         Route::apiResource('shops', ShopController::class, [
             'only' => ['store', 'update', 'destroy'],
@@ -116,7 +118,7 @@ Route::group(
  * Authorized Route for Super Admin only
  * *****************************************
  */
-Route::group(['middleware' => ['permission:'.Permission::SUPER_ADMIN, 'auth:sanctum']], function (): void {
+Route::group(['middleware' => ['permission:'.Permission::SuperAdmin->value, 'auth:sanctum']], function (): void {
     Route::apiResource('withdraws', WithdrawController::class, [
         'only' => ['update', 'destroy'],
     ]);

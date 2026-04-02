@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Repositories;
 
 use Exception;
@@ -12,7 +14,7 @@ use Modules\Vendor\Models\FlashSale;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
 
-class FlashSaleRepository extends BaseRepository
+final class FlashSaleRepository extends BaseRepository
 {
     /**
      * @var array
@@ -68,7 +70,7 @@ class FlashSaleRepository extends BaseRepository
     {
         try {
             // only admin can create flash deals
-            if ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
+            if ($request->user()->hasPermissionTo(Permission::SuperAdmin->value)) {
                 $data = $request->only($this->dataArray);
                 $flash_sale = $this->create($data);
                 if (isset($request['sale_builder']['product_ids'])) {
@@ -96,7 +98,7 @@ class FlashSaleRepository extends BaseRepository
     {
         try {
             // only admin can update flash deals
-            if ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
+            if ($request->user()->hasPermissionTo(Permission::SuperAdmin->value)) {
                 $flash_sale = $this->findOrFail($id);
 
                 $data = $request->only($this->dataArray);
@@ -105,7 +107,7 @@ class FlashSaleRepository extends BaseRepository
                     $this->setProductInFlashSale($request['sale_builder']['product_ids']);
                 }
 
-                if ($flash_sale['sale_builder']['product_ids'] != $request['sale_builder']['product_ids']) {
+                if ($flash_sale['sale_builder']['product_ids'] !== $request['sale_builder']['product_ids']) {
                     $this->unsetProductFromFlashSale($flash_sale['sale_builder']['product_ids'], $request['sale_builder']['product_ids']);
                 }
 

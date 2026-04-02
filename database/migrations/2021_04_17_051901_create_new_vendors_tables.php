@@ -55,7 +55,7 @@ return new class() extends Migration
             $table->foreignUuid('shop_id')->constrained()->cascadeOnDelete();
             $table->float('amount');
             $table->string('payment_method')->nullable();
-            $table->enum('status', WithdrawStatus::getValues())->default(WithdrawStatus::PENDING);
+            $table->enum('status', WithdrawStatus::cases())->default(WithdrawStatus::Pending->value);
             $table->text('details')->nullable();
             $table->text('note')->nullable();
             $table->softDeletes();

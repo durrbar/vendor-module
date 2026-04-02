@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -11,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Modules\Role\Enums\Permission;
 use Modules\User\Models\User;
 
-class StoreNotice extends Model
+final class StoreNotice extends Model
 {
     use HasUlids;
     use SoftDeletes;
@@ -32,10 +34,10 @@ class StoreNotice extends Model
     public static function boot(): void
     {
         parent::boot();
-        static::creating(function ($storeNotice): void {
+        self::creating(function ($storeNotice): void {
             $storeNotice->created_by = Auth::id();
         });
-        static::updating(function ($storeNotice): void {
+        self::updating(function ($storeNotice): void {
             $storeNotice->updated_by = Auth::id();
         });
     }
@@ -81,11 +83,11 @@ class StoreNotice extends Model
 
         $permissionArr = $permissions->pluck('name')->toArray();
 
-        if (in_array(Permission::SUPER_ADMIN, $permissionArr)) {
-            return ucfirst(str_replace('_', ' ', Permission::SUPER_ADMIN));
+        if (in_array(Permission::SuperAdmin->value, $permissionArr)) {
+            return ucfirst(str_replace('_', ' ', Permission::SuperAdmin->value));
         }
 
-        return ucfirst(str_replace('_', ' ', Permission::STORE_OWNER));
+        return ucfirst(str_replace('_', ' ', Permission::StoreOwner->value));
     }
 
     public function getIsReadAttribute(): bool

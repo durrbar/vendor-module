@@ -20,12 +20,12 @@ return new class() extends Migration
 
         Schema::create('store_notices', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->enum('priority', StoreNoticePriority::getValues())->default(StoreNoticePriority::LOW);
+            $table->enum('priority', StoreNoticePriority::cases())->default(StoreNoticePriority::Low->value);
             $table->text('notice');
             $table->text('description')->nullable();
             $table->dateTime('effective_from')->default(now());
             $table->dateTime('expired_at');
-            $table->enum('type', StoreNoticeType::getValues());
+            $table->enum('type', StoreNoticeType::cases());
             $table->foreignUuid('created_by')->nullable()->constrained('users');
             $table->foreignUuid('updated_by')->nullable()->constrained('users');
             $table->timestamps();

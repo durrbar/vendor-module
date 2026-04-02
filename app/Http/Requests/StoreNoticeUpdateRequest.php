@@ -1,42 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 use Modules\Vendor\Enums\StoreNoticePriority;
 use Modules\Vendor\Enums\StoreNoticeType;
 
-class StoreNoticeUpdateRequest extends FormRequest
+final class StoreNoticeUpdateRequest extends FormRequest
 {
-    /**
-     * Rule Variable
-     *
-     * @var array
-     */
-    protected $rules = [];
-
-    /**
-     * array Store notice type
-     *
-     * @var array
-     */
-    protected $typeArr = [
-        StoreNoticeType::ALL_VENDOR,
-        StoreNoticeType::SPECIFIC_VENDOR,
-        StoreNoticeType::ALL_SHOP,
-        StoreNoticeType::SPECIFIC_SHOP,
-    ];
-
-    /**
-     * array Store notice Priority
-     *
-     * @var array
-     */
-    protected $priorityArr = [StoreNoticePriority::HIGH, StoreNoticePriority::MEDIUM, StoreNoticePriority::LOW];
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -55,13 +31,13 @@ class StoreNoticeUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'priority' => ['required', 'string', Rule::in($this->priorityArr)],
+            'priority' => ['required', 'string', new Enum(StoreNoticePriority::class)],
             'notice' => ['required', 'string'],
             'description' => ['nullable', 'string', 'max:10000'],
             'effective_from' => ['nullable', 'date'],
             'expired_at' => ['required', 'date', 'after:effective_from'],
-            'type' => ['required', 'string', Rule::in($this->typeArr)],
-            'received_by' => ['required_if              :type,'.StoreNoticeType::SPECIFIC_VENDOR.','.StoreNoticeType::SPECIFIC_SHOP, 'array'],
+            'type' => ['required', 'string', new Enum(StoreNoticeType::class)],
+            'received_by' => ['required_if              :type,'.StoreNoticeType::SpecificVendor->value.','.StoreNoticeType::SpecificShop->value, 'array'],
             'received_by.*' => ['nullable', 'integer'],
         ];
     }

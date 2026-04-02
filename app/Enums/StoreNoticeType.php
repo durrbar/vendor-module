@@ -1,19 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Enums;
 
-use BenSampo\Enum\Enum;
-
-/**
- * Class StoreNoticeType
- */
-final class StoreNoticeType extends Enum
+enum StoreNoticeType: string
 {
-    public const ALL_VENDOR = 'all_vendor';
-
-    public const SPECIFIC_VENDOR = 'specific_vendor';
-
-    public const ALL_SHOP = 'all_shop';
-
-    public const SPECIFIC_SHOP = 'specific_shop';
+    case AllVendor = 'all_vendor';
+    case SpecificVendor = 'specific_vendor';
+    case AllShop = 'all_shop';
+    case SpecificShop = 'specific_shop';
 }

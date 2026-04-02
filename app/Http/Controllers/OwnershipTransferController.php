@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Http\Controllers;
 
 use Exception;
@@ -14,7 +16,7 @@ use Modules\Role\Enums\Permission;
 use Modules\Vendor\Events\OwnershipTransferStatusControl;
 use Modules\Vendor\Repositories\OwnershipTransferRepository;
 
-class OwnershipTransferController extends CoreController
+final class OwnershipTransferController extends CoreController
 {
     public $repository;
 
@@ -27,7 +29,7 @@ class OwnershipTransferController extends CoreController
      * Display a listing of the resource.
      *
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function index(Request $request)
     {
@@ -43,11 +45,11 @@ class OwnershipTransferController extends CoreController
         $user = $request->user();
 
         switch ($user) {
-            case $user->hasPermissionTo(Permission::SUPER_ADMIN):
+            case $user->hasPermissionTo(Permission::SuperAdmin->value):
                 $query = $this->repository->whereNotNull('id');
                 break;
 
-            case $user->hasPermissionTo(Permission::STORE_OWNER):
+            case $user->hasPermissionTo(Permission::StoreOwner->value):
 
                 if ($request->type === 'from') {
                     $query = $this->repository->where('from', '=', $user->id);
@@ -102,7 +104,7 @@ class OwnershipTransferController extends CoreController
      * @param  int  $id
      * @return OwnershipTransferResource
      *
-     * @throws \Modules\Core\Exceptions\DurrbarException
+     * @throws DurrbarException
      */
     public function update(Request $request, $id)
     {
@@ -119,7 +121,7 @@ class OwnershipTransferController extends CoreController
     {
         try {
             $user = $request->user();
-            if (! $user->hasPermissionTo(Permission::SUPER_ADMIN)) {
+            if (! $user->hasPermissionTo(Permission::SuperAdmin->value)) {
                 throw new AuthorizationException(NOT_AUTHORIZED);
             }
             $data = $this->repository->updateOwnershipTransfer($request);

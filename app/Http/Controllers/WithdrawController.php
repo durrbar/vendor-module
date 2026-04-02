@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Http\Controllers;
 
 use Illuminate\Auth\Access\AuthorizationException;
@@ -19,7 +21,7 @@ use Prettus\Validator\Exceptions\ValidatorException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class WithdrawController extends CoreController
+final class WithdrawController extends CoreController
 {
     public $repository;
 
@@ -46,21 +48,20 @@ class WithdrawController extends CoreController
 
         try {
             $user = $request->user();
-            $shop_id = isset($request['shop_id']) && $request['shop_id'] != 'undefined' ? $request['shop_id'] : false;
+            $shop_id = isset($request['shop_id']) && $request['shop_id'] !== 'undefined' ? $request['shop_id'] : false;
             if ($shop_id) {
                 if ($user->shops()->where('id', $shop_id)->exists()) {
                     return $this->repository->with(['shop'])->where('shop_id', '=', $shop_id);
-                } elseif ($user && $user->hasPermissionTo(Permission::SUPER_ADMIN)) {
+                }
+                if ($user && $user->hasPermissionTo(Permission::SuperAdmin->value)) {
                     return $this->repository->with(['shop'])->where('shop_id', '=', $shop_id);
-                } else {
-                    throw new AuthorizationException(NOT_AUTHORIZED);
                 }
+                throw new AuthorizationException(NOT_AUTHORIZED);
             } else {
-                if ($user && $user->hasPermissionTo(Permission::SUPER_ADMIN)) {
+                if ($user && $user->hasPermissionTo(Permission::SuperAdmin->value)) {
                     return $this->repository->with(['shop'])->where('id', '!=', null);
-                } else {
-                    throw new AuthorizationException(NOT_AUTHORIZED);
                 }
+                throw new AuthorizationException(NOT_AUTHORIZED);
             }
         } catch (DurrbarException $e) {
             throw new DurrbarException($e->getMessage());
@@ -77,7 +78,7 @@ class WithdrawController extends CoreController
     public function store(WithdrawRequest $request)
     {
         try {
-            if ($request->user() && ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN) || $request->user()->shops()->where('id', $request->shop_id)->exists())) {
+            if ($request->user() && ($request->user()->hasPermissionTo(Permission::SuperAdmin->value) || $request->user()->shops()->where('id', $request->shop_id)->exists())) {
                 $validatedData = $request->validated();
                 if (! isset($validatedData['shop_id'])) {
                     throw new BadRequestHttpException(WITHDRAW_MUST_BE_ATTACHED_TO_SHOP);
@@ -90,7 +91,7 @@ class WithdrawController extends CoreController
                 $balance->withdrawn_amount += $validatedData['amount'];
                 $balance->current_balance -= $validatedData['amount'];
                 $balance->save();
-                $withdraw->status = WithdrawStatus::PENDING;
+                $withdraw->status = WithdrawStatus::Pending->value;
 
                 return $withdraw;
             }
@@ -118,7 +119,7 @@ class WithdrawController extends CoreController
         try {
             $id = $request->id;
             $withdraw = $this->repository->with(['shop'])->findOrFail($id);
-            if ($request->user() && ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN) || $request->user()->shops()->where('id', $withdraw->shop_id)->exists())) {
+            if ($request->user() && ($request->user()->hasPermissionTo(Permission::SuperAdmin->value) || $request->user()->shops()->where('id', $withdraw->shop_id)->exists())) {
                 return $withdraw;
             }
             throw new AuthorizationException(NOT_AUTHORIZED);
@@ -148,7 +149,7 @@ class WithdrawController extends CoreController
     public function destroy(Request $request, $id)
     {
         try {
-            if ($request->user() && $request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
+            if ($request->user() && $request->user()->hasPermissionTo(Permission::SuperAdmin->value)) {
                 return $this->repository->findOrFail($id)->delete();
             }
             throw new AuthorizationException(NOT_AUTHORIZED);
@@ -160,7 +161,7 @@ class WithdrawController extends CoreController
     public function approveWithdraw(Request $request)
     {
         try {
-            if ($request->user() && $request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
+            if ($request->user() && $request->user()->hasPermissionTo(Permission::SuperAdmin->value)) {
                 $id = $request->id;
                 $status = $request->status->value ?? $request->status;
                 $withdraw = $this->repository->findOrFail($id);

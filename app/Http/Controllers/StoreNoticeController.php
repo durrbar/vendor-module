@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Http\Controllers;
 
 use Exception;
@@ -21,7 +23,7 @@ use Modules\Vendor\Repositories\StoreNoticeRepository;
 use Prettus\Validator\Exceptions\ValidatorException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class StoreNoticeController extends CoreController
+final class StoreNoticeController extends CoreController
 {
     public $repository;
 
@@ -69,7 +71,7 @@ class StoreNoticeController extends CoreController
     public function store(StoreNoticeRequest $request)
     {
         try {
-            if ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN) || $this->repository->hasPermission($request->user(), $request->received_by[0] ?? 0)) {
+            if ($request->user()->hasPermissionTo(Permission::SuperAdmin->value) || $this->repository->hasPermission($request->user(), $request->received_by[0] ?? 0)) {
                 return $this->repository->saveStoreNotice($request);
             }
             throw new AuthorizationException(NOT_AUTHORIZED);
@@ -95,7 +97,7 @@ class StoreNoticeController extends CoreController
      */
     public function getUsersToNotify(Request $request)
     {
-        $typeArr = [StoreNoticeType::ALL_SHOP, StoreNoticeType::ALL_VENDOR];
+        $typeArr = [StoreNoticeType::AllShop->value, StoreNoticeType::AllVendor->value];
         if (in_array($request->type, $typeArr)) {
             throw new HttpException(400, ACTION_NOT_VALID);
         }
@@ -151,7 +153,7 @@ class StoreNoticeController extends CoreController
     {
         $id = $request->id;
         try {
-            if ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN) || $this->repository->hasPermission($request->user(), $request->received_by[0] ?? 0)) {
+            if ($request->user()->hasPermissionTo(Permission::SuperAdmin->value) || $this->repository->hasPermission($request->user(), $request->received_by[0] ?? 0)) {
                 $storeNotice = $this->repository->findOrFail($id);
 
                 return $this->repository->updateStoreNotice($request, $storeNotice);

@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Http\Controllers;
 
+use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -26,7 +29,7 @@ use Modules\Vendor\Models\Shop;
 use Modules\Vendor\Repositories\ShopRepository;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class ShopController extends CoreController
+final class ShopController extends CoreController
 {
     use OrderStatusManagerWithPaymentTrait;
 
@@ -62,7 +65,7 @@ class ShopController extends CoreController
     public function store(ShopCreateRequest $request)
     {
         try {
-            if ($request->user()->hasPermissionTo(Permission::STORE_OWNER)) {
+            if ($request->user()->hasPermissionTo(Permission::StoreOwner->value)) {
                 return $this->repository->storeShop($request);
             }
             throw new AuthorizationException(NOT_AUTHORIZED);
@@ -81,7 +84,7 @@ class ShopController extends CoreController
         $shop = $this->repository
             ->with(['categories', 'owner', 'ownership_history'])
             ->withCount(['orders', 'products']);
-        if ($request->user() && ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN) || $request->user()->shops()->where('slug', $slug)->exists())) {
+        if ($request->user() && ($request->user()->hasPermissionTo(Permission::SuperAdmin->value) || $request->user()->shops()->where('slug', $slug)->exists())) {
             $shop = $shop->with('balance');
         }
         try {
@@ -114,7 +117,7 @@ class ShopController extends CoreController
     public function updateShop(Request $request)
     {
         $id = $request->id;
-        if ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN) || ($request->user()->hasPermissionTo(Permission::STORE_OWNER) && $request->user()->shops()->where('id', $id)->exists())) {
+        if ($request->user()->hasPermissionTo(Permission::SuperAdmin->value) || ($request->user()->hasPermissionTo(Permission::StoreOwner->value) && $request->user()->shops()->where('id', $id)->exists())) {
             return $this->repository->updateShop($request, $id);
         }
         throw new AuthorizationException(NOT_AUTHORIZED);
@@ -150,10 +153,10 @@ class ShopController extends CoreController
     public function deleteShop(Request $request)
     {
         $id = $request->id;
-        if ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN) || ($request->user()->hasPermissionTo(Permission::STORE_OWNER) && $request->user()->shops()->where('id', $id)->exists())) {
+        if ($request->user()->hasPermissionTo(Permission::SuperAdmin->value) || ($request->user()->hasPermissionTo(Permission::StoreOwner->value) && $request->user()->shops()->where('id', $id)->exists())) {
             try {
                 $shop = $this->repository->findOrFail($id);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 throw new ModelNotFoundException(NOT_FOUND);
             }
             $shop->delete();
@@ -167,14 +170,14 @@ class ShopController extends CoreController
     {
 
         try {
-            if (! $request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
+            if (! $request->user()->hasPermissionTo(Permission::SuperAdmin->value)) {
                 throw new DurrbarException(NOT_AUTHORIZED);
             }
             $id = $request->id;
             $admin_commission_rate = $request->admin_commission_rate;
             try {
                 $shop = $this->repository->findOrFail($id);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 throw new ModelNotFoundException(NOT_FOUND);
             }
             $shop->is_active = true;
@@ -204,13 +207,13 @@ class ShopController extends CoreController
     public function disApproveShop(Request $request)
     {
         try {
-            if (! $request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
+            if (! $request->user()->hasPermissionTo(Permission::SuperAdmin->value)) {
                 throw new DurrbarException(NOT_AUTHORIZED);
             }
             $id = $request->id;
             try {
                 $shop = $this->repository->findOrFail($id);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 throw new ModelNotFoundException(NOT_FOUND);
             }
 
@@ -229,7 +232,7 @@ class ShopController extends CoreController
     {
         try {
             if ($this->repository->hasPermission($request->user(), $request->shop_id)) {
-                $permissions = [Permission::CUSTOMER, Permission::STAFF];
+                $permissions = [Permission::Customer->value, Permission::Staff->value];
                 $user = User::create([
                     'name' => $request->name,
                     'email' => $request->email,
@@ -238,7 +241,7 @@ class ShopController extends CoreController
                 ]);
 
                 $user->givePermissionTo($permissions);
-                $user->assignRole(Role::STAFF);
+                $user->assignRole(Role::Staff->value);
 
                 return true;
             }
@@ -264,10 +267,10 @@ class ShopController extends CoreController
         $id = $request->id;
         try {
             $staff = User::findOrFail($id);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ModelNotFoundException(NOT_FOUND);
         }
-        if ($request->user()->hasPermissionTo(Permission::STORE_OWNER) || ($request->user()->hasPermissionTo(Permission::STORE_OWNER) && $request->user()->shops()->where('id', $staff->shop_id)->exists())) {
+        if ($request->user()->hasPermissionTo(Permission::StoreOwner->value) || ($request->user()->hasPermissionTo(Permission::StoreOwner->value) && $request->user()->shops()->where('id', $staff->shop_id)->exists())) {
             $staff->delete();
 
             return $staff;

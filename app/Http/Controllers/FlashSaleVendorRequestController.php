@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Http\Controllers;
 
 use Illuminate\Auth\Access\AuthorizationException;
@@ -19,7 +21,7 @@ use Modules\Vendor\Models\FlashSale;
 use Modules\Vendor\Repositories\FlashSaleVendorRequestRepository;
 use Prettus\Validator\Exceptions\ValidatorException;
 
-class FlashSaleVendorRequestController extends CoreController
+final class FlashSaleVendorRequestController extends CoreController
 {
     public $repository;
 
@@ -139,7 +141,7 @@ class FlashSaleVendorRequestController extends CoreController
     {
         try {
             $user = $request->user();
-            if ($user && ($user->hasPermissionTo(Permission::SUPER_ADMIN) || $user->hasPermissionTo(Permission::STORE_OWNER) || $user->hasPermissionTo(Permission::STAFF))) {
+            if ($user && ($user->hasPermissionTo(Permission::SuperAdmin->value) || $user->hasPermissionTo(Permission::StoreOwner->value) || $user->hasPermissionTo(Permission::Staff->value))) {
 
                 $flash_sale_request = $this->repository->findOrFail($request->id);
                 $requested_products = $flash_sale_request->products;
@@ -155,7 +157,7 @@ class FlashSaleVendorRequestController extends CoreController
                         if (in_array($product->id, $flash_sale->products->pluck('id')->toArray())) {
                             $flash_sale->products()->detach($product->id);
                         }
-                        array_push($detached_products_array, $product->id);
+                        $detached_products_array[] = $product->id;
                     }
                     $flash_sale->save();
                 }
@@ -184,7 +186,7 @@ class FlashSaleVendorRequestController extends CoreController
     public function approveFlashSaleProductsRequest(Request $request)
     {
         try {
-            if (! $request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
+            if (! $request->user()->hasPermissionTo(Permission::SuperAdmin->value)) {
                 throw new DurrbarException(NOT_AUTHORIZED);
             }
             $id = $request->id;
@@ -202,7 +204,7 @@ class FlashSaleVendorRequestController extends CoreController
     public function disapproveFlashSaleProductsRequest(Request $request)
     {
         try {
-            if (! $request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
+            if (! $request->user()->hasPermissionTo(Permission::SuperAdmin->value)) {
                 throw new DurrbarException(NOT_AUTHORIZED);
             }
             $id = $request->id;

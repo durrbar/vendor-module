@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Vendor\Repositories;
 
 use Exception;
@@ -20,7 +22,7 @@ use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class ShopRepository extends BaseRepository
+final class ShopRepository extends BaseRepository
 {
     /**
      * @var array
@@ -96,7 +98,7 @@ class ShopRepository extends BaseRepository
             }
             if (isset($request['balance'])) {
                 if (isset($request['balance']['admin_commission_rate']) && $shop->balance->admin_commission_rate !== $request['balance']['admin_commission_rate']) {
-                    if ($request->user()->hasPermissionTo(Permission::SUPER_ADMIN)) {
+                    if ($request->user()->hasPermissionTo(Permission::SuperAdmin->value)) {
                         $this->updateBalance($request['balance'], $id);
                     }
                 } else {
@@ -104,7 +106,7 @@ class ShopRepository extends BaseRepository
                 }
             }
             $data = $request->only($this->dataArray);
-            if (! empty($request->slug) && $request->slug != $shop['slug']) {
+            if (! empty($request->slug) && $request->slug !== $shop['slug']) {
                 $data['slug'] = $this->makeSlug($request);
             }
             $shop->update($data);
@@ -137,10 +139,10 @@ class ShopRepository extends BaseRepository
     {
         $shop = $this->findOrFail($id);
         if ($request['isShopUnderMaintenance'] && $request['isMaintenance']) {
-            Product::where('shop_id', '=', $id)->update(['visibility' => ProductVisibilityStatus::VISIBILITY_PRIVATE]);
+            Product::where('shop_id', '=', $id)->update(['visibility' => ProductVisibilityStatus::VisibilityPrivate->value]);
             event(new ShopMaintenance($shop, 'start'));
         } else {
-            Product::where('shop_id', '=', $id)->update(['visibility' => ProductVisibilityStatus::VISIBILITY_PUBLIC]);
+            Product::where('shop_id', '=', $id)->update(['visibility' => ProductVisibilityStatus::VisibilityPublic->value]);
             event(new ShopMaintenance($shop, 'disable'));
         }
     }
@@ -179,7 +181,7 @@ class ShopRepository extends BaseRepository
                 'message' => $request?->message,
                 'to' => $newOwnerId,
                 'created_by' => $user->id,
-                'status' => DefaultStatusType::PENDING,
+                'status' => DefaultStatusType::Pending->value,
             ]
         );
 
