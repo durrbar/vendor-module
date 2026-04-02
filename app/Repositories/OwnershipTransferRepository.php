@@ -11,6 +11,7 @@ use Modules\Core\Exceptions\DurrbarBadRequestException;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Order\Enums\OrderStatus;
 use Modules\Order\Models\Order;
+use Modules\Vendor\Enums\WithdrawStatus;
 use Modules\Vendor\Models\OwnershipTransfer;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
@@ -66,7 +67,7 @@ class OwnershipTransferRepository extends BaseRepository
             )->count();
 
         $nonApprovedWithdrawCount = count(array_filter($shop->withdraws->toArray(), function ($withdraw) {
-            return $withdraw['status'] !== 'approved';
+            return $withdraw['status'] !== WithdrawStatus::Approved->value;
         }));
 
         // Required : no running order, all order must be completed.
