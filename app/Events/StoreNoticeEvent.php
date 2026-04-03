@@ -22,12 +22,6 @@ class StoreNoticeEvent implements ShouldBroadcast, ShouldQueue
     use InteractsWithSockets;
     use SerializesModels;
 
-    /**
-     * Create a new event instance.
-     *
-     * @param  StoreNotice|array  $storeNotice
-     * @param  User|array  $user
-     */
     public function __construct(
         public StoreNotice $storeNotice,
         public ?string $action,
@@ -41,15 +35,14 @@ class StoreNoticeEvent implements ShouldBroadcast, ShouldQueue
      */
     public function broadcastOn(): array
     {
-        $event_channels = [];
+        $eventChannels = [];
         if (isset($this->storeNotice->users)) {
             foreach ($this->storeNotice->users as $user) {
-                $channel_name = new PrivateChannel('store_notice.created.'.$user->id);
-                $event_channels[] = $channel_name;
+                $eventChannels[] = new PrivateChannel('store_notice.created.'.$user->id);
             }
         }
 
-        return $event_channels;
+        return $eventChannels;
     }
 
     /**
@@ -60,7 +53,6 @@ class StoreNoticeEvent implements ShouldBroadcast, ShouldQueue
     public function broadcastWith(): array
     {
         return [
-            // 'store_notice' => $this->storeNotice,
             'message' => '1 new store notice.',
         ];
     }
@@ -70,7 +62,6 @@ class StoreNoticeEvent implements ShouldBroadcast, ShouldQueue
      */
     public function broadcastAs(): string
     {
-        // event's name will be written here.
         return 'store.notice.event';
     }
 
@@ -88,7 +79,7 @@ class StoreNoticeEvent implements ShouldBroadcast, ShouldQueue
             }
 
             if (isset($settings->options['pushNotification']['all']['storeNotice'])) {
-                if ($settings->options['pushNotification']['all']['storeNotice'] === true && $this->action = 'create') {
+                if ($settings->options['pushNotification']['all']['storeNotice'] === true && $this->action === 'create') {
                     $enableBroadCast = true;
                 }
             }

@@ -8,8 +8,5 @@ use Modules\Vendor\Models\Shop;
 
 class ShopMaintenance
 {
-    /**
-     * Create a new event instance.
-     */
     public function __construct(public readonly Shop $shop, public mixed $action) {}
 }

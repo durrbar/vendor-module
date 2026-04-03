@@ -10,11 +10,6 @@ use Modules\Vendor\Models\Shop;
 
 class ProcessOwnershipTransition implements ShouldQueue
 {
-    /**
-     * Create a new event instance.
-     *
-     * @param  mixed  $optional
-     */
     public function __construct(
         public Shop $shop,
         public User $previousOwner,

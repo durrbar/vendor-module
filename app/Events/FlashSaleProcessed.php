@@ -8,11 +8,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 
 class FlashSaleProcessed implements ShouldQueue
 {
-    /**
-     * Create a new event instance.
-     *
-     * @param  $flash_sale
-     */
     public function __construct(
         public mixed $action,
         public mixed $language = null,

@@ -16,8 +16,5 @@ class CommissionRateUpdateEvent
     use InteractsWithSockets;
     use SerializesModels;
 
-    /**
-     * Create a new event instance.
-     */
     public function __construct(public readonly Shop $shop, public Balance $balance) {}
 }
