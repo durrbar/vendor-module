@@ -17,7 +17,7 @@ class UpdateWithdrawRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -27,7 +27,7 @@ class UpdateWithdrawRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'shop_id' => ['required', 'exists:Modules\Vendor\Models\Shop,id'],
@@ -39,7 +39,7 @@ class UpdateWithdrawRequest extends FormRequest
         ];
     }
 
-    public function failedValidation(Validator $validator)
+    public function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(response()->json($validator->errors(), 422));
     }

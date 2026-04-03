@@ -18,7 +18,7 @@ class StoreNoticeRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -28,7 +28,7 @@ class StoreNoticeRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'priority' => ['required', 'string', new Enum(StoreNoticePriority::class)],
@@ -47,7 +47,7 @@ class StoreNoticeRequest extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             'received_by.required_if' => 'Please! Select at least one Specific receiver.',
@@ -59,7 +59,7 @@ class StoreNoticeRequest extends FormRequest
      *
      * @return void
      */
-    public function failedValidation(Validator $validator)
+    public function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(response()->json($validator->errors(), 422));
     }
