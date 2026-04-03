@@ -19,5 +19,5 @@ class CommissionRateUpdateEvent
     /**
      * Create a new event instance.
      */
-    public function __construct(public Shop $shop, public Balance $balance) {}
+    public function __construct(public readonly Shop $shop, public Balance $balance) {}
 }

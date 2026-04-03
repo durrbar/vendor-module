@@ -12,5 +12,5 @@ class OwnershipTransferStatusControl implements ShouldQueue
     /**
      * Create a new event instance.
      */
-    public function __construct(public OwnershipTransfer $ownershipTransfer) {}
+    public function __construct(public readonly OwnershipTransfer $ownershipTransfer) {}
 }

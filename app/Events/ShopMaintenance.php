@@ -11,5 +11,5 @@ class ShopMaintenance
     /**
      * Create a new event instance.
      */
-    public function __construct(public Shop $shop, public mixed $action) {}
+    public function __construct(public readonly Shop $shop, public mixed $action) {}
 }
