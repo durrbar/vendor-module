@@ -116,7 +116,6 @@ class FlashSaleController extends CoreController
     /**
      * updateFlashSale
      *
-     * @return void
      */
     public function updateFlashSale(Request $request)
     {
@@ -160,7 +159,6 @@ class FlashSaleController extends CoreController
     /**
      * getFlashSaleInfoByProductID
      *
-     * @return void
      */
     public function getFlashSaleInfoByProductID(Request $request)
     {
@@ -181,7 +179,6 @@ class FlashSaleController extends CoreController
     /**
      * getProductsByFlashSale
      *
-     * @return void
      */
     public function getProductsByFlashSale(Request $request)
     {

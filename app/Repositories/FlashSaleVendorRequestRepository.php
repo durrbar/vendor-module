@@ -54,7 +54,6 @@ class FlashSaleVendorRequestRepository extends BaseRepository
      * storeFlashSaleRequest
      *
      * @param  mixed  $request
-     * @return void
      */
     public function storeFlashSaleRequest($request)
     {
@@ -100,7 +99,6 @@ class FlashSaleVendorRequestRepository extends BaseRepository
      * approveFlashSaleVendorRequestFunc
      *
      * @param  string  $id
-     * @return void
      */
     public function approveFlashSaleVendorRequestFunc($id)
     {
@@ -142,7 +140,6 @@ class FlashSaleVendorRequestRepository extends BaseRepository
      * disapproveFlashSaleVendorRequestFunc
      *
      * @param  string  $id
-     * @return void
      */
     public function disapproveFlashSaleVendorRequestFunc($id)
     {

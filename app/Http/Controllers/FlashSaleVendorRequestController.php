@@ -115,7 +115,6 @@ class FlashSaleVendorRequestController extends CoreController
     /**
      * updateFlashSaleRequest
      *
-     * @return void
      */
     public function updateFlashSaleRequest(Request $request)
     {
@@ -181,7 +180,6 @@ class FlashSaleVendorRequestController extends CoreController
     /**
      * approveFlashSaleProductsRequest
      *
-     * @return void
      */
     public function approveFlashSaleProductsRequest(Request $request)
     {
@@ -199,7 +197,6 @@ class FlashSaleVendorRequestController extends CoreController
     /**
      * disapproveFlashSaleProductsRequest
      *
-     * @return void
      */
     public function disapproveFlashSaleProductsRequest(Request $request)
     {

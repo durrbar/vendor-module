@@ -57,7 +57,6 @@ class StoreNoticeRequest extends FormRequest
     /**
      * Handle a failed validation attempt.
      *
-     * @return void
      */
     public function failedValidation(Validator $validator): void
     {

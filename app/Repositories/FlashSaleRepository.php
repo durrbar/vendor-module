@@ -64,7 +64,6 @@ class FlashSaleRepository extends BaseRepository
      * storeFlashSale
      *
      * @param  mixed  $request
-     * @return void
      */
     public function storeFlashSale($request)
     {
@@ -92,7 +91,6 @@ class FlashSaleRepository extends BaseRepository
      *
      * @param  mixed  $request
      * @param  mixed  $id
-     * @return void
      */
     public function updateFlashSale(Request $request, $id)
     {
@@ -126,7 +124,6 @@ class FlashSaleRepository extends BaseRepository
      * setProductInFlashSale
      *
      * @param  array  $product_ids
-     * @return void
      */
     public function setProductInFlashSale($product_ids)
     {
@@ -142,7 +139,6 @@ class FlashSaleRepository extends BaseRepository
      *
      * @param  array  $previous_list
      * @param  array  $new_list
-     * @return void
      */
     public function unsetProductFromFlashSale($previous_list, $new_list)
     {
