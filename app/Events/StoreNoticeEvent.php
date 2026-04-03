@@ -23,39 +23,17 @@ class StoreNoticeEvent implements ShouldBroadcast, ShouldQueue
     use SerializesModels;
 
     /**
-     * user
-     *
-     * @var User
-     */
-    public $user;
-
-    /**
-     * storeNotice
-     *
-     * @var StoreNotice
-     */
-    public $storeNotice;
-
-    /**
-     * action
-     *
-     * @var string
-     */
-    public $action;
-
-    /**
      * Create a new event instance.
      *
      * @param  StoreNotice|array  $storeNotice
      * @param  User|array  $user
      * @return void
      */
-    public function __construct(StoreNotice $storeNotice, ?string $action, User $user)
-    {
-        $this->storeNotice = $storeNotice;
-        $this->action = $action;
-        $this->user = $user;
-    }
+    public function __construct(
+        public StoreNotice $storeNotice,
+        public ?string $action,
+        public User $user
+    ) {}
 
     /**
      * Get the channels the event should broadcast on.

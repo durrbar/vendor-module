@@ -9,13 +9,8 @@ use Modules\Vendor\Models\OwnershipTransfer;
 
 class OwnershipTransferStatusControl implements ShouldQueue
 {
-    public OwnershipTransfer $ownershipTransfer;
-
     /**
      * Create a new event instance.
      */
-    public function __construct(OwnershipTransfer $ownershipTransfer)
-    {
-        $this->ownershipTransfer = $ownershipTransfer;
-    }
+    public function __construct(public OwnershipTransfer $ownershipTransfer) {}
 }
