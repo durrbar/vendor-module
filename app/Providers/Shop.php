@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\App;
 
 class Shop
 {
-    public $request;
+    public mixed $request;
 
     public function __construct()
     {
@@ -20,7 +20,7 @@ class Shop
      * @param  $data  array
      * @return array
      */
-    public function call($action, $data)
+    public function call(string $action, mixed $data): mixed
     {
         if (! is_array($data)) {
             return [];
