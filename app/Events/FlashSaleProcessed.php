@@ -8,18 +8,18 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 
 class FlashSaleProcessed implements ShouldQueue
 {
-    public $action;
+    public mixed $action;
 
-    public $language;
+    public mixed $language;
 
-    public $optional_data;
+    public mixed $optional_data;
 
     /**
      * Create a new event instance.
      *
      * @param  $flash_sale
      */
-    public function __construct($action, $language = null, $optional_data = null)
+    public function __construct(mixed $action, mixed $language = null, mixed $optional_data = null)
     {
         $this->action = $action;
         $this->language = $language;

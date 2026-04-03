@@ -13,26 +13,26 @@ class ProcessOwnershipTransition implements ShouldQueue
     /**
      * @var Shop
      */
-    public $shop;
+    public Shop $shop;
 
     /**
      * @var User
      */
-    public $previousOwner;
+    public User $previousOwner;
 
     /**
      * @var User
      */
-    public $newOwner;
+    public User $newOwner;
 
-    public $optional;
+    public mixed $optional;
 
     /**
      * Create a new event instance.
      *
      * @param  mixed  $optional
      */
-    public function __construct(Shop $shop, User $previousOwner, User $newOwner, $optional = null)
+    public function __construct(Shop $shop, User $previousOwner, User $newOwner, mixed $optional = null)
     {
         $this->shop = $shop;
         $this->previousOwner = $previousOwner;
