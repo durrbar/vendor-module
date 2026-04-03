@@ -27,7 +27,6 @@ class StoreNoticeEvent implements ShouldBroadcast, ShouldQueue
      *
      * @param  StoreNotice|array  $storeNotice
      * @param  User|array  $user
-     * @return void
      */
     public function __construct(
         public StoreNotice $storeNotice,
