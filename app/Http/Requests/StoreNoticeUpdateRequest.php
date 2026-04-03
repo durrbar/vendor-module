@@ -13,21 +13,11 @@ use Modules\Vendor\Enums\StoreNoticeType;
 
 class StoreNoticeUpdateRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
     public function rules(): array
     {
         return [
@@ -37,16 +27,11 @@ class StoreNoticeUpdateRequest extends FormRequest
             'effective_from' => ['nullable', 'date'],
             'expired_at' => ['required', 'date', 'after:effective_from'],
             'type' => ['required', 'string', new Enum(StoreNoticeType::class)],
-            'received_by' => ['required_if              :type,'.StoreNoticeType::SpecificVendor->value.','.StoreNoticeType::SpecificShop->value, 'array'],
+            'received_by' => ['required_if:type,'.StoreNoticeType::SpecificVendor->value.','.StoreNoticeType::SpecificShop->value, 'array'],
             'received_by.*' => ['nullable', 'integer'],
         ];
     }
 
-    /**
-     * Get the validation custom messages that apply to the request.
-     *
-     * @return array
-     */
     public function messages(): array
     {
         return [
@@ -54,10 +39,6 @@ class StoreNoticeUpdateRequest extends FormRequest
         ];
     }
 
-    /**
-     * Handle a failed validation attempt.
-     *
-     */
     public function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(response()->json($validator->errors(), 422));
